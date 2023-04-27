@@ -6,4 +6,4 @@ page = requests.get(URL)
 
 soup = BeautifulSoup(page.content, "html.parser")
 
-print(soup.find(id="mrt-node-Lead-3-FinanceHeader").text) 
+print(soup.find(id="mrt-node-Lead-3-FinanceHeader").text)
