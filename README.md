@@ -1,5 +1,5 @@
 # Examining The Collapse: Silicon Valley Bank & First Republic Bank
-This repository contains a data engineering project that examines the predictability of the collaps of Silicon Valley Bank (SVB) and First Republic Bank through a data-driven approach. The project includes an analysis of the data from these banks to build a predictive model that assesses the riskof their failure, as well as a detailed analysis of the reasons behind the collapse of SVB and First Rebulic Bank.
+This repository contains a data engineering project that examines the predictability of the collapse of Silicon Valley Bank (SVB) and First Republic Bank through a data-driven approach. The project includes an analysis of the data from these banks to build a predictive model that assesses the risk of their failure, as well as a detailed analysis of the reasons behind the collapse of SVB and First Rebulic Bank.
 
 ### Project Overview
 The goal of this project is to investigte whether the failures of SVB and First Republic Bank were predicatable or not, and to provide valuable insights into the predictability of bank failures and highlight some important proactive measures to prevent them.
