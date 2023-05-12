@@ -1,0 +1,6 @@
+Dow Jones US Indexes
+-------------------------------------
+    - For the 'Dow Jones US Finincial Services Index' (ex: https://www.spglobal.com/spdji/en/indices/equity/dow-jones-us-financial-services-index/#overview),
+    it should be noted that the csv file would need to be updated to reflect updated data in the future.
+        - This process could be circumvented by finding the exact source that populates the graph
+
