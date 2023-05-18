@@ -1,6 +1,6 @@
 import boto3
 import os
-from pprint import pprint
+# from pprint import pprint
 import pathlib
 
 # connect to S3
@@ -23,6 +23,8 @@ def upload_file():
         response = s3.upload_file(file_name, bucket_name, object_name)
         if response == None:
             print("Success")
+        else:
+            print("Failed")
     except Exception as e:
         print(e)
 
