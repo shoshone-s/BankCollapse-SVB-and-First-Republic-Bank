@@ -17,6 +17,7 @@ def upload_file():
         # uses the boto3 client
         s3 = boto3.client('s3')
         bucket_name = 'ds4ateam20'
+        # make sure the object name and file name match
         object_name = 'svb_debt.csv'
         file_name = os.path.join(pathlib.Path(
             __file__).parent.resolve(), 'svb_debt.csv')
