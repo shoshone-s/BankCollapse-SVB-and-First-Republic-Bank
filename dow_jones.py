@@ -45,3 +45,28 @@ print('Export Link:', link)
 
 # Quit the web driver
 
+# Download file onto my local machine 
+
+import requests
+
+# URL of the Excel file
+url = 'https://www.spglobal.com/spdji/en/idsexport/file.xls?hostIdentifier=48190c8c-42c4-46af-8d1a-0cd5db894797&redesignExport=true&languageId=1&selectedModule=PerformanceGraphView&selectedSubModule=Graph&yearFlag=oneYearFlag&indexId=101113936'
+
+# Send a GET request to download the file
+response = requests.get(url)
+
+# Check if the request was successful
+if response.status_code == 200:
+    # Retrieve the filename from the response headers
+    content_disposition = response.headers.get('content-disposition')
+    filename = content_disposition.split('filename=')[1].strip('"')
+
+    # Save the file locally
+    with open(filename, 'wb') as file:
+        file.write(response.content)
+
+    print(f'Successfully downloaded the file as: {filename}')
+else:
+    print('Failed to download the file.')
+ 
+
