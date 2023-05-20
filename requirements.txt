@@ -1,1 +1,1 @@
-yfinance 
+yfinance --upgrade --no-cache-dir
