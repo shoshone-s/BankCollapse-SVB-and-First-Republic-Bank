@@ -6,15 +6,12 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-# Set up the Selenium web driver
-# service = Service('path/to/chromedriver')
-# options = Options()
-# options.headless = True  # Run Chrome in headless mode (no GUI)
-# driver = webdriver.Chrome(service=service, options=options)
+import requests
+
 
 options = webdriver.ChromeOptions()
-options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-chrome_driver_binary = "/usr/local/bin/chromedriver"
+options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" # TODO: replace with function that finds each person's respective Chrome browser 
+chrome_driver_binary = "/usr/local/bin/chromedriver" # TODO: replace with function that finds each person's respective Chrome browser 
 driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
 
 # Navigate to the webpage
@@ -47,13 +44,13 @@ print('Export Link:', link)
 
 # Download file onto my local machine 
 
-import requests
+# # URL of the Excel file
+# url = 'https://www.spglobal.com/spdji/en/idsexport/file.xls?hostIdentifier=48190c8c-42c4-46af-8d1a-0cd5db894797&redesignExport=true&languageId=1&selectedModule=PerformanceGraphView&selectedSubModule=Graph&yearFlag=oneYearFlag&indexId=101113936'
 
-# URL of the Excel file
-url = 'https://www.spglobal.com/spdji/en/idsexport/file.xls?hostIdentifier=48190c8c-42c4-46af-8d1a-0cd5db894797&redesignExport=true&languageId=1&selectedModule=PerformanceGraphView&selectedSubModule=Graph&yearFlag=oneYearFlag&indexId=101113936'
+url = str(link)
 
 # Send a GET request to download the file
-response = requests.get(url)
+response = requests.get(link)
 
 # Check if the request was successful
 if response.status_code == 200:
