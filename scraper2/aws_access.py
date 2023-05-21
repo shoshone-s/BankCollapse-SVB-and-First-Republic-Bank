@@ -4,21 +4,12 @@ import pathlib
 
 
 # upload file to an S3 bucket
-def upload_file():
+def upload_file(bucket_name, file_name, object_name):
     try:
         # uses the boto3 client
         s3 = boto3.client('s3')
 
-        # specify the S3 bucket name
-        bucket_name = input('Bucket Name: ')
-
-        # make sure the object name and file name match
-
-        # object_name will prompt in the terminal to specify the object name uploaded to the S3 bucket
-        object_name = input('Object Name: ')
-        # file name is the name that you saved your file under. It will prompt for the file name
-        file_name = input('File Name: ')
-
+        
         file_name_path = os.path.join(pathlib.Path(
             __file__).parent.resolve(), file_name)
 
@@ -33,4 +24,7 @@ def upload_file():
         print(e)
 
 
-upload_file()
+# files should be specified in this order: bucket name, file name, object name
+# bucket_name='bucket name', file_name='name_of_file', object_name='name_of_object'
+upload_file(bucket_name='ds4ateam20', file_name='',
+            object_name='')
