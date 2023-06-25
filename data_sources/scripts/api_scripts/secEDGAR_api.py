@@ -4,6 +4,8 @@
 import requests
 import pandas as pd
 import os
+import time
+import csv
 from dotenv import load_dotenv, dotenv_values
 load_dotenv()
 
@@ -29,85 +31,43 @@ def companyTickerData(headers, companyTicker):
             else:
                 pass
     except:
-        print(f'Sorry, no company found with ticker: {companyTicker}')
+        return f'Sorry, no company found with ticker: {companyTicker}'
     
-    return 
+    return ''
 
-# request specific company information
-# SVB data
-# SIVBQ - is the ticker for SVB Financial Group
-# svbTickerData=tickerData['6118']
-
-# First Republic Bank data
-# FRCB - this is the ticker for First Republic Bank
-# frbTickerData=tickerData['5208']
-
-# fill zeros for cik_str
-def getCIKNum(cik_str):
+# function that will query the secEDGAR 'company facts' api route for data
+# this function should do the following:
+# 1 - take the company ticker, find the company's cik (Central Index Key), and add leading zero's (this is needed because the other routes require a 10-digit number)
+# 2 - make requests to the secEDGAR 'company facts' route and pull the 'Assets', 'CommonStockValue', 'CommonStockSharesIssued', 'DeferedRevenue', 'Deposits', 'IncomeTaxesPaid', 'Investments', 'Liabilities', 'OtherAssets', 'OtherLiabilites', 'ProfitLoss', 'SharePrice'
+# 3 - pack the target data into a data frame and write that dataframe to a csv
+def secData(cik_str):
+    # add in leading zeros to company cik_str
     cikNumber=str(cik_str).zfill(10)
-    return cikNumber
+    # init list of data/files to pull
+    queryData = ['Assets', 'CommonStockValue', 
+                'CommonStockSharesIssued', 
+                'DeferredRevenue', 'Deposits', 
+                'IncomeTaxesPaid', 'Investments', 
+                'Liabilities', 'OtherAssets', 
+                'OtherLiabilities', 'ProfitLoss', 'SharePrice']
+    req_payload = {}
 
-# get specific filing metadata for each
-def filingMetadata(cik_str):
-    # # parse out the CIK and add in the leading zeros
-    # # this is because the api endpoint needs a 10 digit number and includes leading zeros
-    cikNumber=getCIKNum(cik_str)
-    # frbCIK=str(cik_str).zfill(10)
-    filingData = requests.get(
-        f'https://data.sec.gov/submissions/CIK{cikNumber}.json',
-        headers=headers
-    )
-    # frbFilingData = requests.get(
-    #     f'https://data.sec.gov/submissions/CIK{frbCIK}.json',
-    #     headers=headers
-    # )
-
-    return filingData.json()
-
-
-# get company facts
-def companyFactsAssets(cik_str):
-    cikNumber=getCIKNum(cik_str)
-    companyFacts = requests.get(
-        f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cikNumber}.json',
-        headers=headers
-    )
-    # # for some reason running into the 'The specified key does not exist - 404' error when running this request
-    # frbCompanyFacts = requests.get(
-    #     f'https://data.sec.gov/api/xbrl/companyfacts/CIK{frbCIK}.json',
-    #     headers=headers
-    # )
-
-    return companyFacts.json()['facts']['us-gaap']['Assets']
-
-
-# get company concept data
-def companyAssets(cik_str):
-    cikNumber=getCIKNum(cik_str)
-    companyConcept = requests.get(
+    req = requests.get(
         (
-            f'https://data.sec.gov/api/xbrl/companyconcept/CIK{cikNumber}/us-gaap/Assets.json'
+            f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cikNumber}.json'
         ),
         headers=headers
     )
+    # create a dictionary of the requested data
+    for query in queryData:
+        req_payload[query]=req.json()['facts']['us-gaap'][query]
+        time.sleep(2)
 
-    # review data
-    # companyConcept.json()['units']['USD'][0]
-    # put data into dataframe
-    companyAssetData = pd.DataFrame.from_dict((companyConcept.json()['units']['USD']))
-    # dataframe of assets on the 10-K form
-    company10_K_Assets = companyAssetData[companyAssetData.form=='10-K']
-    # reset the index
-    company10_K_Assets = company10_K_Assets.reset_index(drop=True)
-    # dataframe of assets on the 10-Q form
-    company10_Q_Assets = companyAssetData[companyAssetData.form=='10-Q']
-    company10_Q_Assets = company10_Q_Assets.reset_index(drop=True)
+    # reform the payload into a clean dict that can them be pushed into a dataframe and create the csv file from the dataframe
+    targetDataDicts = [targetDict for record in req_payload for key in req_payload[record]['units'].keys() for targetDict in req_payload[record]['units'][key]]
+    res_payload = pd.DataFrame.from_dict(targetDataDicts)
+    res_payload.to_csv('../../data/secData.csv', index=False)
 
-    return companyConcept.json()['units']['USD']
-    
-# write dataframes to csv files  
-# form10KPath=os.path.relpath('/Users/axyom7/Desktop/ds4a-capstone/data_sources/data/svb_Form-10K_Assets.csv')
-# form10QPath=os.path.relpath('/Users/axyom7/Desktop/ds4a-capstone/data_sources/data/svb_Form-10Q_Assets.csv')
+    return res_payload
 
-# svb10_K_Assets.to_csv(form10KPath, index=False)
-# svb10_Q_Assets.to_csv(form10QPath, index=False)
+secData('0000719739')
