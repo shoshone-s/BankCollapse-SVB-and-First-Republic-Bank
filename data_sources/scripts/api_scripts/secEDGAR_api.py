@@ -70,4 +70,4 @@ def secData(cik_str):
 
     return res_payload
 
-secData('0000719739')
+
