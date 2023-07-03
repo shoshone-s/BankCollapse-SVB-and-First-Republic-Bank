@@ -1,14 +1,23 @@
 import pandas as pd
 import requests
 import time
+import os
 import configparser
+import aws_read_write
 
 
 # read credentials from the config file
 cfg_data = configparser.ConfigParser()
 cfg_data.read("keys_config.cfg")
+
+S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
+
 # save Alpha Vantage API key
 AV_API_KEY = cfg_data["AlphaVantage"]["api_key"]
+
+
+# location of data files
+data_path = os.path.join(os.getcwd(), "data_sources\data")
 
 
 # pull data for these companies
@@ -65,32 +74,8 @@ stock_prices.to_csv(data_path + "\stock_price_daily.csv", index=False)
 
 
 # upload data to S3 bucket
-upload_file(file_name=data_path + '\company_overview.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/company_overview.csv')
-upload_file(file_name=data_path + '\income_statement.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/income_statement.csv')
-upload_file(file_name=data_path + '\balance_sheet.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/balance_sheet.csv')
-upload_file(file_name=data_path + '\cash_flow.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/cash_flow.csv')
-upload_file(file_name=data_path + '\stock_price_daily.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/stock_price_daily.csv')
-
-
-# combine data from Alpha Vantage and Yahoo Finance
-
-av_stock_price = get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/stock_price_daily.csv')
-av_stock_price.columns = [x.lower().replace(' ','_') for x in av_stock_price.columns]
-av_stock_price['date'] = pd.to_datetime(av_stock_price['date'])
-
-yf_stock_price = get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/price_history.csv').drop(columns=['Unnamed: 0'])
-yf_stock_price.columns = [x.lower().replace(' ','_') for x in yf_stock_price.columns]
-yf_stock_price.rename(columns={'datetime':'date', 'adj_close':'adjusted_close'}, inplace=True)
-yf_stock_price['symbol'] = 'SIVBQ'
-yf_stock_price['date'] = pd.to_datetime(yf_stock_price['date'])
-
-MIN_PRICE_YEAR = 2017
-clean_price_history = pd.concat([
-    av_stock_price[av_stock_price.date.dt.year>=MIN_PRICE_YEAR], 
-    yf_stock_price[yf_stock_price.date.dt.year>=MIN_PRICE_YEAR]
-])[['symbol', 'date', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
-
-
-# save data to csv and upload data to S3 bucket
-clean_price_history.to_csv(data_path + "\clean_price_history.csv", index=False)
-upload_file(file_name=data_path + '\clean_price_history.csv', bucket_name=S3_BUCKET_NAME, object_name='transformed_data/price_history.csv')
+aws_read_write.upload_file(file_name=data_path + '\company_overview.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/company_overview.csv')
+aws_read_write.upload_file(file_name=data_path + '\income_statement.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/income_statement.csv')
+aws_read_write.upload_file(file_name=data_path + '\balance_sheet.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/balance_sheet.csv')
+aws_read_write.upload_file(file_name=data_path + '\cash_flow.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/cash_flow.csv')
+aws_read_write.upload_file(file_name=data_path + '\stock_price_daily.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/stock_price_daily.csv')
