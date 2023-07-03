@@ -54,6 +54,7 @@ clean_price_history = pd.concat([
     yf_stock_price[yf_stock_price.date.dt.year>=MIN_PRICE_YEAR],
     djusbank[djusbank.date.dt.year>=MIN_PRICE_YEAR]
 ])[['symbol', 'date', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
+clean_price_history['volume'] = clean_price_history['volume'].astype('Int64')
 
 
 # save data to csv and upload data to S3 bucket
