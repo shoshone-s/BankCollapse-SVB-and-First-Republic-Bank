@@ -16,7 +16,7 @@ IAM_REDSHIFT = cfg_data["Redshift"]["iam_role"]
 REDSHIFT_REGION_NAME = cfg_data["Redshift"]["region_name"]
 
 
-locations = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='transformed_data/locations.csv')
+# locations = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='transformed_data/locations.csv')
 
 sql_create_location = """
 CREATE TABLE IF NOT EXISTS location (
@@ -56,18 +56,20 @@ aws_read_write.copy_from_s3(
     iam_role=IAM_REDSHIFT,
     region_name=REDSHIFT_REGION_NAME)
 
+print(
 aws_read_write.execute_sql(
     region_name=REDSHIFT_REGION_NAME,
     database_name=REDSHIFT_DB_NAME,
     workgroup_name=REDSHIFT_WORKGROUP_NAME,
     sql_statement="SELECT COUNT(*) FROM location")
+)
 
 
-price_history = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='transformed_data/price_history.csv')
+# price_history = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='transformed_data/price_history.csv')
 
 sql_create_price_history = """
 CREATE TABLE IF NOT EXISTS price_history (
-    symbol          VARCHAR(5) NOT NULL,
+    symbol          VARCHAR(6) NOT NULL,
     date            DATE,
     "open"          NUMERIC,
     high            NUMERIC,
@@ -98,8 +100,10 @@ aws_read_write.copy_from_s3(
     iam_role=IAM_REDSHIFT,
     region_name=REDSHIFT_REGION_NAME)
 
+print(
 aws_read_write.execute_sql(
     region_name=REDSHIFT_REGION_NAME,
     database_name=REDSHIFT_DB_NAME,
     workgroup_name=REDSHIFT_WORKGROUP_NAME,
     sql_statement="SELECT COUNT(*) FROM price_history")
+)
