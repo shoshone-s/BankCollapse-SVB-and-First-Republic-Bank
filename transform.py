@@ -17,7 +17,6 @@ data_path = os.path.join(os.getcwd(), "data_sources\data")
 # selected banks from FDIC
 CERT_LIST = [24735, 59017, 21761, 628, 29147, 27389, 3511, 5146, 18409, 33947, 7213, 3510, 34968, 57803]
 
-institutions_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/institutions.csv')
 locations_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/locations.csv')
 
 clean_locations = locations_df[locations_df.CERT.isin(CERT_LIST)].sort_values('NAME')[['CERT','NAME','MAINOFF','OFFNAME','ESTYMD','SERVTYPE','ADDRESS','COUNTY','CITY','STNAME','ZIP','LATITUDE','LONGITUDE']].rename(columns={'NAME':'company_name', 'MAINOFF':'main_office', 'OFFNAME':'branch_name', 'ESTYMD':'established_date', 'SERVTYPE':'service_type', 'STNAME':'state'})
@@ -48,12 +47,15 @@ djusbank.columns = [x.lower() for x in djusbank.columns]
 djusbank.rename(columns={'ticker':'symbol'}, inplace=True)
 djusbank['date'] = pd.to_datetime(djusbank['date'])
 
-MIN_PRICE_YEAR = 2017
+# keep stock data from Jan 2017 to Mar 2022
+MIN_DATE = pd.Timestamp(2017,1,1)
+MAX_DATE = pd.Timestamp(2022,3,31)
 clean_price_history = pd.concat([
-    av_stock_price[av_stock_price.date.dt.year>=MIN_PRICE_YEAR], 
-    yf_stock_price[yf_stock_price.date.dt.year>=MIN_PRICE_YEAR],
-    djusbank[djusbank.date.dt.year>=MIN_PRICE_YEAR]
+    av_stock_price, 
+    yf_stock_price,
+    djusbank
 ])[['symbol', 'date', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
+clean_price_history = clean_price_history[(clean_price_history.date>=MIN_DATE) & (clean_price_history.date<=MAX_DATE)]
 clean_price_history['volume'] = clean_price_history['volume'].astype('Int64')
 
 
