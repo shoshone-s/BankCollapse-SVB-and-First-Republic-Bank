@@ -1,1 +1,3 @@
-yfinance 
+botocore
+boto3
+yfinance --upgrade --no-cache-dir
