@@ -66,8 +66,9 @@ def secData(cik_str):
     # reform the payload into a clean dict that can them be pushed into a dataframe and create the csv file from the dataframe
     targetDataDicts = [targetDict for record in req_payload for key in req_payload[record]['units'].keys() for targetDict in req_payload[record]['units'][key]]
     res_payload = pd.DataFrame.from_dict(targetDataDicts)
-    res_payload.to_csv('../../data/secData.csv', index=False)
+    res_payload.to_csv('data_sources/data/secData.csv', index=False)
 
-    return res_payload
+    # return res_payload.to_json(orient='records')[1:-1].replace('},{', '} {')
+    return targetDataDicts
 
 
