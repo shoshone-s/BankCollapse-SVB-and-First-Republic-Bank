@@ -83,6 +83,13 @@ def extract_stock_prices():
 
     return stock_prices
 
+# TODO: ADD TRANSFORM methods here
+
+def transform(): 
+    av_stock_price = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/stock_price_daily.csv')
+    av_stock_price.columns = [x.lower().replace(' ','_') for x in av_stock_price.columns]
+    av_stock_price['date'] = pd.to_datetime(av_stock_price['date'])
+
 
 # save data to csv
 # upload data to S3 bucket

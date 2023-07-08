@@ -4,12 +4,11 @@ import configparser
 import aws_read_write
 
 
+
 # read credentials from the config file
 cfg_data = configparser.ConfigParser()
 cfg_data.read("keys_config.cfg")
-
 S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
-
 
 # location of data files
 data_path = os.path.join(os.getcwd(), "data_sources\data")
@@ -32,6 +31,16 @@ def extract_dow_jones_us_banks_index():
     historical_quotes.insert(loc=0, column='Ticker', value='DJUSBK')
 
     return historical_quotes
+
+# TODO: ADD TRANSFORM methods here
+
+def transform(): 
+    djusbank = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/dow_jones_us_banks_index.csv')
+    djusbank.columns = [x.lower() for x in djusbank.columns]
+    djusbank.rename(columns={'ticker':'symbol'}, inplace=True)
+    djusbank['date'] = pd.to_datetime(djusbank['date']) 
+
+    
 
 def load_dow_jones_us_banks_index():
 
