@@ -37,9 +37,6 @@ link_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((B
 # Retrieve the link
 link = link_element.get_attribute('href')
 
-# Print the link
-print('Export Link:', link)
-
 # Quit the web driver
 
 # Download file onto my local machine 
