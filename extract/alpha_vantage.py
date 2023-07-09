@@ -23,6 +23,8 @@ AV_API_KEY = cfg_data["AlphaVantage"]["api_key"]
 RAW_DATA_PATHS = [
 ]
 
+SOURCE_NAME = 'alpha_vantage'
+
 # location of data files
 data_path = os.path.join(os.getcwd(), "data\clean_data")
 
@@ -97,6 +99,7 @@ def load_raw_companies():
 
     util.load_raw_data(companies_df, csv_file_name, s3_object_name)
 
+# FIXME: This data is not being transformed or to a table in the database
 def load_raw_income_statement():
     incst_df = extract_companies()
     csv_file_name = "\\income_statement.csv"
@@ -104,42 +107,29 @@ def load_raw_income_statement():
 
     util.load_raw_data(incst_df, csv_file_name, s3_object_name)
 
+# FIXME: This data is not being transformed or to a table in the database
 def load_raw_balance_sheet():
     balsh_df = extract_balance_sheet()
-    balsh_df.to_csv(data_path + "\\balance_sheet.csv", index=False)
-    aws_read_write.upload_file(file_name=data_path + '\\balance_sheet.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/balance_sheet.csv')
-
-def load_raw_balance_sheet():
-    balsh_df = extract_balance_sheet()
-    csv_file_name = "\\income_statement.csv"
-    s3_object_name= 'raw_data/income_statement.csv'
+    csv_file_name = "\\balance_sheet.csv"
+    s3_object_name= 'raw_data/balance_sheet.csv'
 
     util.load_raw_data(balsh_df, csv_file_name, s3_object_name)
 
-
+# FIXME: This data is not being transformed or to a table in the database
 def load_raw_cashflow():
-    cashflow = extract_cashflow()
-    cashflow.to_csv(data_path + "\\cash_flow.csv", index=False)
-    aws_read_write.upload_file(file_name=data_path + '\\cash_flow.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/cash_flow.csv')
+    cashflow_df = extract_cashflow()
+    csv_file_name = "\\cash_flow.csv"
+    s3_object_name= 'raw_data/cash_flow.csv'
 
-def load_raw_cashflow():
-    balsh_df = extract_balance_sheet()
-    csv_file_name = "\\income_statement.csv"
-    s3_object_name= 'raw_data/income_statement.csv'
+    util.load_raw_data(cashflow_df, csv_file_name, s3_object_name)
 
-    util.load_raw_data(balsh_df, csv_file_name, s3_object_name)
-
-def load_raw_stock_prices():
+def load_raw_price_history():
     stock_prices = extract_stock_prices()
-    stock_prices.to_csv(data_path + "\\stock_price_daily.csv", index=False)
-    aws_read_write.upload_file(file_name=data_path + '\\stock_price_daily.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/cash_flow.csv')
+    dest_table_name = 'price_history'
+    csv_file_name = SOURCE_NAME + dest_table_name + '.csv'
+    s3_object_name= 'raw_data/alpha_vantage_price_history.csv'
 
-def load_raw_stock_prices():
-    balsh_df = extract_balance_sheet()
-    csv_file_name = "\\income_statement.csv"
-    s3_object_name= 'raw_data/income_statement.csv'
-
-    util.load_raw_data(balsh_df, csv_file_name, s3_object_name)
+    util.load_raw_data(stock_prices, csv_file_name, s3_object_name)
 
 ### END OF EXTRACT METHODS ###
 
@@ -164,7 +154,7 @@ def transform_price_history():
 
 def load_clean_price_history():
 
-    # Merge existing clean price history data in s3 with new data
+    clean_data_path = 'price_history.csv'
     existing_object_name='clean_data/price_history.csv'
     clean_av_stock_price = transform_price_history()
 

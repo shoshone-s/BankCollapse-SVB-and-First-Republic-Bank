@@ -12,11 +12,9 @@ import aws_read_write
 from dotenv import load_dotenv, dotenv_values
 load_dotenv()
 
-cfg_data = configparser.ConfigParser()
-cfg_data.read("keys_config.cfg")
 
 # DEFAULT_config=dotenv_values('.env')
-DEFAULT_headers = cfg_data["SEC_EDGAR_USER_AGENT"]["user_agent"]
+DEFAULT_headers = util.cfg_data["SEC_EDGAR_USER_AGENT"]["user_agent"]
 
 
 # request for basic company data
@@ -116,14 +114,10 @@ def transform_sec_data():
     return clean_sec_df
 
 def load_clean_sec_data():
-    # Merge existing clean price history data in s3 with new data
-    existing_price_history_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
-    clean_av_stock_price = transform_price_history()
 
-    price_history = pd.concat([existing_price_history_df, clean_av_stock_price])
-    
-    # save data to csv and upload data to S3 bucket
-    price_history.to_csv(data_path + "\\price_history.csv", index=False)
-    aws_read_write.upload_file(file_name=data_path + '\\price_history.csv', bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
+    clean_data_path = 'sec_data.csv'
+    clean_data_object_name='data/clean_data/sec_data.csv'
+    new_clean_df = transform_sec_data()
 
+    util.load_clean_data(new_clean_df, clean_data_path, clean_data_object_name)
 
