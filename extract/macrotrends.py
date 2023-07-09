@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import urllib.request
 import pandas as pd
 import aws_read_write
+import util
 
 def extract_debt_to_equity():
     # url
@@ -54,13 +55,16 @@ def extract_debt_to_equity():
     return df
 
 def load_raw_debt_to_equity():
-    df = extract_debt_to_equity()
-    df.to_csv('macrotrends_debt_to_equity.csv', index=False, header=False)
-    aws_read_write.upload_file(file_name=data_path + '\\macrotrends_debt_to_equity.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/balance_sheet.csv')
+    mt_df = extract_debt_to_equity()
+    csv_file_name = "macrotrends_debt_to_equity.csv"
+    s3_object_name= 'raw_data/macrotrends_debt_to_equity.csv'
+
+    load_raw_data(mt_df, csv_file_name, s3_object_name)
+
 
 ### transform  methods
 def transform():
     # get raw data from s3
-    df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/macrotrends_debt_to_equity.csv')
+    df = aws_read_write.get_csv(bucket_name=util.S3_BUCKET_NAME, object_name='raw_data/macrotrends_debt_to_equity.csv')
 
     # Make raw data columns match DebtToEquity table
