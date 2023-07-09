@@ -2,6 +2,7 @@ import csv
 from bs4 import BeautifulSoup
 import urllib.request
 import pandas as pd
+import aws_read_write
 
 def extract():
     # url
@@ -52,7 +53,7 @@ def extract():
 
     return df
 
-def load():
+def load_raw_balance_sheet():
     df = extract()
-    df.to_csv('svb_debt.csv', index=False, header=False)
-    aws_read_write.upload_file(file_name=data_path + '\\balance_sheet.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/balance_sheet.csv')
+    df.to_csv('macrotrends_balance_sheet.csv', index=False, header=False)
+    aws_read_write.upload_file(file_name=data_path + '\\macrotrends_balance_sheet.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/balance_sheet.csv')

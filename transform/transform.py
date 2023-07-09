@@ -17,16 +17,11 @@ S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
 # location of data files
 data_path = os.path.join(os.getcwd(), "data_sources\data")
 
-
+# TODO: Add all transform methods from all data sources here...
 
 def transform_price_history():
 
     # combine data from Alpha Vantage, Yahoo Finance, and DJUSBK
-
-    av_stock_price = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/locations.csv')
-
-    yf_stock_price = 
-    djusbank = 
 
 
     # keep stock data from Jan 2017 to Mar 2022

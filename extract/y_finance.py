@@ -40,6 +40,10 @@ def extract():
     df = pd.concat(day_data_lst)
     return df 
 
+def load_raw_price_history(): 
+    df = extract() 
+    df.to_csv("yfinance.csv")
+
 #TODO : Add transform 
 
 def transform(): 
@@ -49,6 +53,28 @@ def transform():
     yf_stock_price['symbol'] = 'SIVBQ'
     yf_stock_price['date'] = pd.to_datetime(yf_stock_price['date']) 
 
-def load(): 
-    df = extract() 
-    df.to_csv("yfinance.csv")
+        # keep stock data from Jan 2017 to Mar 2022
+    MIN_DATE = pd.Timestamp(2017,1,1)
+    MAX_DATE = pd.Timestamp(2022,3,31)
+    yf_stock_price = yf_stock_price[['symbol', 'date', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
+    yf_stock_price = yf_stock_price[(yf_stock_price.date>=MIN_DATE) & (yf_stock_price.date<=MAX_DATE)]
+    yf_stock_price['volume'] = yf_stock_price['volume'].astype('Int64')
+
+    return yf_stock_price
+
+def load_clean_price_history():
+
+    # Merge existing clean price history data in s3 with new data
+    existing_price_history_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
+    clean_yf_stock_price = transform()
+
+    price_history = pd.concat([existing_price_history_df, clean_yf_stock_price])
+    
+    # save data to csv and upload data to S3 bucket
+    price_history.to_csv(data_path + "\\price_history.csv", index=False)
+    aws_read_write.upload_file(file_name=data_path + '\\price_history.csv', bucket_name=S3_BUCKET_NAME, object_name='transformed_data/price_history.csv')
+
+
+### END TRANSFORM METHODS ###
+
+
