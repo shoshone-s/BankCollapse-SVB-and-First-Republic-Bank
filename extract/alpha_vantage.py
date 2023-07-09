@@ -19,9 +19,11 @@ S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
 # save Alpha Vantage API key
 AV_API_KEY = cfg_data["AlphaVantage"]["api_key"]
 
+RAW_DATA_PATHS = [
+]
 
 # location of data files
-data_path = os.path.join(os.getcwd(), "data_sources\data")
+data_path = os.path.join(os.getcwd(), "data\clean_data")
 
 
 # pull data for these companies
@@ -83,41 +85,65 @@ def extract_stock_prices():
 
     return stock_prices
 
-# TODO: ADD TRANSFORM methods here
+# upload raw data to S3 bucket
 
-def transform(): 
-    av_stock_price = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/stock_price_daily.csv')
-    av_stock_price.columns = [x.lower().replace(' ','_') for x in av_stock_price.columns]
-    av_stock_price['date'] = pd.to_datetime(av_stock_price['date'])
-
-
-# save data to csv
-# upload data to S3 bucket
-
-def load_companies():
+def load_raw_companies():
     companies_df = extract_companies()
     companies_df.to_csv(data_path + "\\companies.csv", index=False)
     aws_read_write.upload_file(file_name=data_path + '\\income_statement.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/income_statement.csv')
 
-def load_income_statement():
+def load_rawincome_statement():
     incst_df = extract_income_statement()
     incst_df.to_csv(data_path + "\\income_statement.csv", index=False)
     aws_read_write.upload_file(file_name=data_path + '\\income_statement.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/income_statement.csv')
 
-def load_balance_sheet():
+def load_raw_balance_sheet():
     balsh_df = extract_balance_sheet()
     balsh_df.to_csv(data_path + "\\balance_sheet.csv", index=False)
     aws_read_write.upload_file(file_name=data_path + '\\balance_sheet.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/balance_sheet.csv')
 
-def load_cashflow():
+def load_raw_cashflow():
     cashflow = extract_cashflow()
     cashflow.to_csv(data_path + "\\cash_flow.csv", index=False)
     aws_read_write.upload_file(file_name=data_path + '\\cash_flow.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/cash_flow.csv')
 
-def load_stock_prices():
+def load_raw_stock_prices():
     stock_prices = extract_stock_prices()
     stock_prices.to_csv(data_path + "\\stock_price_daily.csv", index=False)
     aws_read_write.upload_file(file_name=data_path + '\\stock_price_daily.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/cash_flow.csv')
 
 
 
+
+### TRANSFORM METHODS ###
+
+# TODO: Move transform methods to ./transform/
+
+def transform(): 
+    av_stock_price = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/stock_price_daily.csv')
+    av_stock_price.columns = [x.lower().replace(' ','_') for x in av_stock_price.columns]
+    av_stock_price['date'] = pd.to_datetime(av_stock_price['date'])
+
+    # keep stock data from Jan 2017 to Mar 2022
+    MIN_DATE = pd.Timestamp(2017,1,1)
+    MAX_DATE = pd.Timestamp(2022,3,31)
+    clean_av_stock_price = av_stock_price[['symbol', 'date', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
+    clean_av_stock_price = clean_av_stock_price[(clean_av_stock_price.date>=MIN_DATE) & (clean_av_stock_price.date<=MAX_DATE)]
+    clean_av_stock_price['volume'] = clean_av_stock_price['volume'].astype('Int64')
+
+    return clean_av_stock_price
+
+def load_clean_price_history():
+
+    # Merge existing clean price history data in s3 with new data
+    existing_price_history_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
+    clean_av_stock_price = transform()
+
+    price_history = pd.concat([existing_price_history_df, clean_av_stock_price])
+    
+    # save data to csv and upload data to S3 bucket
+    price_history.to_csv(data_path + "\\price_history.csv", index=False)
+    aws_read_write.upload_file(file_name=data_path + '\\price_history.csv', bucket_name=S3_BUCKET_NAME, object_name='transformed_data/price_history.csv')
+
+
+### END TRANSFORM METHODS ###
