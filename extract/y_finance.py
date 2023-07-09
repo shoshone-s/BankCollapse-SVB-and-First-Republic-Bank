@@ -75,4 +75,10 @@ def load_clean_price_history():
 
 ### END TRANSFORM METHODS ###
 
-
+def extract(table_name='all'): 
+    if table_name == 'all':
+        load_raw_price_history()
+    elif table_name == 'price_history':
+        load_raw_price_history()
+    else:
+        print("Invalid table name.")

@@ -1,3 +1,4 @@
 # Ignore files related to API keys
 *.env
 *.cfg
+/__pycache__/
