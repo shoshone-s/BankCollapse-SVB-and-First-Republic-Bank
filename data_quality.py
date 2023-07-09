@@ -12,6 +12,7 @@ df_cashflow = pd.read_csv("raw_data/cash_flow.csv")
 df_incomest = pd.read_csv("raw_data/income_statement.csv")
 df_stockprice = pd.read_csv("raw_data/stock_price_daily.csv")
 df_svbdebt = pd.read_csv("raw_data/svb_debt.csv")
+df_company = pd.read_csv('raw_data/company_overview.csv')
 
 
 # Balance Sheet Data
@@ -186,7 +187,6 @@ df_svbdebt[svbdebt_num_vars].isnull().sum().sort_values(ascending=False)
 
 #income statement
 incomest_date = df_incomest.fiscalDateEnding
-print(incomest_date)
 
 
 # In[23]:
@@ -194,7 +194,6 @@ print(incomest_date)
 
 #stock data
 stock_date = df_stockprice.date
-print(stock_date)
 
 
 # In[24]:
@@ -202,69 +201,68 @@ print(stock_date)
 
 #debt to equity ratio
 debt_date = df_svbdebt.Date
-print(debt_date)
 
 
 # In[25]:
 
 
-#check that dates from income statements, stock data and debt to equity is from Jan 2017 to Mar 2022
-def date_check_debt():
+def date_check(df1: pd.DataFrame, df2: pd.DataFrame, df3: pd.DataFrame):    
     begin_date = '2017-01-01'
     end_date = '2022-01-01'
     
-    after_start_date = debt_date >= begin_date
-    before_end_date = debt_date <= end_date
-    between_debt_dates = after_start_date & before_end_date
-    #between_income_dates = after_start_date & before_end_date
+    debt_after_start_date = debt_date >= begin_date
+    debt_before_end_date = debt_date <= end_date
+    debt_between_dates = debt_after_start_date & debt_before_end_date
     
-    df2_svbdebt = df_svbdebt.loc[between_debt_dates]
+    income_after_start_date = incomest_date >= begin_date
+    income_before_end_date = incomest_date <= end_date
+    income_between_dates = income_after_start_date & income_before_end_date
+    
+    stock_after_start_date = stock_date >= begin_date
+    stock_before_end_date = stock_date <= end_date
+    stock_between_dates = stock_after_start_date & stock_before_end_date
+    
+    df2_debt = debt_date.loc[debt_between_dates]
+    count_dates_svbdebt = df2_debt.value_counts().sum()
+    
+    df2_income = incomest_date.loc[income_between_dates]
+    count_dates_income = df2_income.value_counts().sum()
+        
+    df2_stock = stock_date.loc[stock_between_dates]
+    count_dates_stock = df2_stock.value_counts().sum()
 
-    #df_svbdebt.loc[between_debt_dates]
-    #df2_incomest = df_incomest.loc[between_income_dates]
-    
-    return df2_svbdebt.value_counts().sum()
+    return count_dates_svbdebt, count_dates_income, count_dates_stock
 
-def date_check_income():
-    begin_date = '2017-01-01'
-    end_date = '2022-01-01'
-    
-    after_start_date = incomest_date >= begin_date
-    before_end_date = incomest_date <= end_date
-    between_income_dates = after_start_date & before_end_date
-    #between_income_dates = after_start_date & before_end_date
-    
-    df2_income = df_incomest.loc[between_income_dates]
 
-    #df_svbdebt.loc[between_debt_dates]
-    #df2_incomest = df_incomest.loc[between_income_dates]
-    
-    return df2_income.value_counts().sum()
+# In[26]:
 
-def date_check_stockprice():
-    begin_date = '2017-01-01'
-    end_date = '2022-01-01'
-    
-    after_start_date = stock_date >= begin_date
-    before_end_date = stock_date <= end_date
-    between_stockprice_dates = after_start_date & before_end_date
-    #between_income_dates = after_start_date & before_end_date
-    
-    df2_stockprice = df_stockprice.loc[between_stockprice_dates]
 
-    #df_svbdebt.loc[between_debt_dates]
-    #df2_incomest = df_incomest.loc[between_income_dates]
-    
-    return df2_stockprice.value_counts().sum()
-   
+#date check count
+total_svbdebt_date_count, total_income_date_count, total_stock_date_count = date_check(debt_date, incomest_date, stock_date)
+
+print(f"Total dates in Debt To Equity Ratio that are outside of 2017-01-01 to 2022-01-01: {total_svbdebt_date_count}")
+print(f"Total dates in Income Statement that are outside of 2017-01-01 to 2022-01-01: {total_income_date_count}")
+print(f"Total dates in Stock Price History that are outside of 2017-01-01 to 2022-01-01: {total_stock_date_count}")
 
 
 # In[27]:
 
 
-print(f"Total dates in Debt To Equity Ratio that are outside of 2017-01-01 and 2022-01-01: {date_check_debt()}")
-print(f"Total dates in Income Statement that are outside of 2017-01-01 and 2022-01-01: {date_check_income()}")
-print(f"Total dates in Stock Price History that are outside of 2017-01-01 and 2022-01-01: {date_check_stockprice()}")
+company_num_vars = df_company.columns[df_company.dtypes != 'object']
+company_cat_vars = df_company.columns[df_company.dtypes == 'object']
+print(company_num_vars)
+print(company_cat_vars)
+
+
+# In[28]:
+
+
+#checking for missing values not NaN in the symbol column
+def missing_symbols():
+    missing_symbols = df_company['Symbol'].isnull().values.any()
+    if missing_symbols == True:
+        raise RuntimeError('Symbol Not Found')
+    
 
 
 # In[ ]:
