@@ -90,8 +90,10 @@ def extract_sec_data():
 
 def load_raw_sec_data():
     sec_data_df = extract_sec_data()
-    sec_data_df.to_csv(data_path + "\\sec_data.csv", index=False)
-    aws_read_write.upload_file(file_name=data_path + '\\sec_data.csv', bucket_name=util.S3_BUCKET_NAME, object_name='raw_data/sec_data.csv')
+    csv_file_name = "\\sec_data.csv"
+    s3_object_name= 'raw_data/sec_data.csv'
+
+    util.load_raw_data(sec_data_df, csv_file_name, s3_object_name)
 
 
 def transform_sec_data():

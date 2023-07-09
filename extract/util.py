@@ -15,15 +15,23 @@ S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
 # save Alpha Vantage API key
 AV_API_KEY = cfg_data["AlphaVantage"]["api_key"]
 
-clean_data_path = os.path.join(os.getcwd(), "data\trans_data")
+CLEAN_DATA_PATH = os.path.join(os.getcwd(), "data\clean_data")
+RAW_DATA_PATH = os.path.join(os.getcwd(), "data\\raw_data")
+
+def load_raw_data(raw_df, csv_file_name, s3_object_name):
+
+    csv_file_name= RAW_DATA_PATH +  csv_file_name
+
+    raw_df.to_csv(csv_file_name, index=False)
+    aws_read_write.upload_file(file_name=csv_file_name, bucket_name=S3_BUCKET_NAME, object_name= s3_object_name)
 
 
 def load_clean_data(new_clean_df, clean_data_path, clean_data_object_name):
     # Merge existing clean price history data in s3 with new data
-    existing_price_history_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name=clean_data_object_name)
+    existing_obj_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name=clean_data_object_name)
     
-    price_history = pd.concat([existing_price_history_df, new_clean_df])
+    new_obj_df = pd.concat([existing_obj_df, new_clean_df])
     
     # save data to csv and upload data to S3 bucket
-    price_history.to_csv(clean_data_path, index=False)
+    new_obj_df.to_csv(clean_data_path, index=False)
     aws_read_write.upload_file(file_name=clean_data_path, bucket_name=S3_BUCKET_NAME, object_name=clean_data_object_name)
