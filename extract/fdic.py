@@ -128,6 +128,7 @@ def transform_locations():
     clean_locations['zip'] = clean_locations['zip'].astype(str)
     clean_locations.loc[~clean_locations.state.isin(['Puerto Rico','Virgin Islands Of The U.S.']) & clean_locations.zip.apply(lambda x: len(x)!=5), 'zip'] = clean_locations['zip'].str.zfill(5)
 
+def load_clean_locations():
     clean_locations.to_csv(data_path + "\\clean_locations.csv", index=False)
     aws_read_write.upload_file(file_name=data_path + '\\clean_locations.csv', bucket_name=S3_BUCKET_NAME, object_name='clean_data/locations.csv')
 
