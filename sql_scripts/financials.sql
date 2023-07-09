@@ -1,4 +1,5 @@
 CREATE TABLE IF NOT EXISTS financials (
+    ID int NOT NULL serial primary key,
     FOREIGN KEY (company_id) REFERENCES company(company_id),
     report_date            DATE,
     total_assets           BIGINT(255),

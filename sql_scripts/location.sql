@@ -1,4 +1,5 @@
 CREATE TABLE IF NOT EXISTS location (
+    ID int NOT NULL serial primary key,
     cert               INTEGER NOT NULL,
     company_name       VARCHAR(255),
     main_office        BOOL,
