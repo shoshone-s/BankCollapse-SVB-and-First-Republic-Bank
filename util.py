@@ -15,8 +15,8 @@ S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
 # save Alpha Vantage API key
 AV_API_KEY = cfg_data["AlphaVantage"]["api_key"]
 
-CLEAN_DATA_PATH = os.path.join(os.getcwd(), "data\clean_data")
-RAW_DATA_PATH = os.path.join(os.getcwd(), "data\\raw_data")
+CLEAN_DATA_PATH = os.path.join(os.getcwd(), "data\clean_data\\")
+RAW_DATA_PATH = os.path.join(os.getcwd(), "data\\raw_data\\")
 
 def load_raw_data(raw_df, csv_file_name, s3_object_name):
     # csv_file_name = SOURCE_NAME + "_" + dest_table_name + '.csv'

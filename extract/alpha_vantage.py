@@ -132,8 +132,8 @@ def load_raw_cashflow():
 def load_raw_price_history():
     stock_prices = extract_stock_prices()
     dest_table_name = 'price_history'
-    csv_file_name = SOURCE_NAME + dest_table_name + '.csv'
-    s3_object_name= 'raw_data/' + csv_file_name
+    csv_file_name = SOURCE_NAME + "_" + dest_table_name + '.csv'
+    s3_object_name= 'raw_data/' + "testingtestingtesting"+ csv_file_name 
 
     util.load_raw_data(stock_prices, csv_file_name, s3_object_name)
 
@@ -188,3 +188,17 @@ def load_clean_companies():
     s3_object_name= 'raw_data/' + csv_file_name
 
 ### END TRANSFORM METHODS ###
+
+load_raw_price_history()
+
+# q: Why do i get this error when i run this file?
+# A: You need to run this file from the root directory of the project
+
+#q: How can i access /Users/naledikekana/BankCollapse-SVB-and-First-Republic-Bank/aws_read_write.py from this file?
+#A: You need to run this file from the root directory of the project
+
+#q: how can i run this file from the root directory of the project?
+#A: python extract/alpha_vantage.py
+
+#q: that didn't work
+#A: python -m extract.alpha_vantage
