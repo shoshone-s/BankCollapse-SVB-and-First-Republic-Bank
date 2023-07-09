@@ -36,8 +36,6 @@ def load_clean_location():
     util.load_clean_data(clean_av_stock_price, clean_data_path, existing_object_name)
 
 
-
-
 def load_clean_financials():
 
     clean_data_path = 'financials.csv'
