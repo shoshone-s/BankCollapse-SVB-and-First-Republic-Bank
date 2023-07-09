@@ -7,6 +7,6 @@ CREATE TABLE Company (
 	Symbol varchar(255),
 	EstablishedDate date,
 	Sector varchar(255),
-	Industry varchar(255),
+	Industry varchar(255)
 
 );

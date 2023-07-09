@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS financials (
     equity_return          BIGINT(255),
     efficiency             BIGIGNT(255),
     risk_base_capital_ratio BIGINT(255), 
-    symbol                 VARCHAR(255),
+    symbol                 VARCHAR(255)
 );
