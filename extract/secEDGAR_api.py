@@ -9,8 +9,12 @@ import csv
 from dotenv import load_dotenv, dotenv_values
 load_dotenv()
 
-config=dotenv_values('.env')
-headers = {'User-Agent': os.getenv('SEC_EDGAR_USER_AGENT')}
+cfg_data = configparser.ConfigParser()
+cfg_data.read("keys_config.cfg")
+
+# DEFAULT_config=dotenv_values('.env')
+DEFAULT_headers = cfg_data["SEC_EDGAR_USER_AGENT"]["user_agent"]
+
 
 # request for basic company data
 # this will return a list of dictionaries containing the following:
@@ -72,13 +76,36 @@ def secData(cik_str):
     return targetDataDicts
 
 def extract_sec_data():
-    pass 
+    cfg_head = DEFAULT_headers
+    ticker_symbol = 'SIVBQ'
+    tickerInfo = companyTickerData(cfg_head, ticker_symbol)
+    data = secData(tickerInfo['cik_str']) 
+
+    sec_df = pd.DataFrame(data)
+
+    return sec_df.reset_index()
 
 def load_raw_sec_data():
     pass
 
 def transform_sec_data():
-    pass
+    rename_cols = {
+        'end': 'end_date',
+        'val': 'value',
+        'accn': 'asset_num',
+        'fy': 'fiscal_year',
+        'fp': 'fiscal_period',
+        'form': 'form',
+        'filed': 'date_filed',
+        'frame': 'frame',
+        'start': 'start_date',
+        'index': 'id'
+    }
+
+    sec_df = extract_sec_data()
+    clean_sec_df = sec_df.rename(columns=rename_cols)
+
+    return clean_sec_df
 
 def load_clean_sec_data():
     pass
