@@ -1,9 +1,12 @@
 CREATE TABLE Company (
-	ID int NOT NULL serial primary key, --setting primary key in postgres using serial keyword
-	Name varchar(60),
-	SymbolID int NOT NULL,
+	ID int NOT NULL primary key, --setting primary key in postgres using serial keyword
+	Name varchar(255),
 	FDICCertID int NOT NULL,
-	Class varchar(60),
-	Status varchar(60),
-	FOREIGN KEY (SymbolID) REFERENCES Symbol(ID)
+	Category varchar(255),
+	Status varchar(255),
+	Symbol varchar(255),
+	EstablishedDate date,
+	Sector varchar(255),
+	Industry varchar(255),
+
 );
