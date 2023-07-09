@@ -125,19 +125,27 @@ def drop_table(region_name, database_name, workgroup_name, table_name):
 
 # populate table with data from S3
 def copy_from_s3(region_name, database_name, workgroup_name, table_name, object_path, iam_role):
+    
+    data_format = "CSV" if object_path.endswith('csv') else "PARQUET" if object_path.endswith('parquet') else ""
+    
+    addl_params = """
+        DELIMITER ',' 
+        BLANKSASNULL 
+        EMPTYASNULL 
+        FILLRECORD 
+        IGNOREBLANKLINES 
+        IGNOREHEADER 1 
+        ROUNDEC 
+        TRIMBLANKS 
+    """ if object_path.endswith('csv') else ""
+    
     sql_statement = f"""
         COPY {table_name} 
         FROM '{object_path}' 
         IAM_ROLE '{iam_role}' 
         REGION '{region_name}' 
-        CSV 
-        DELIMITER ',' 
-        BLANKSASNULL 
-        EMPTYASNULL 
-        IGNOREBLANKLINES 
-        IGNOREHEADER 1 
-        ROUNDEC 
-        TRIMBLANKS 
+        FORMAT AS {data_format} 
+        {addl_params}
         ;
     """
     execute_sql(region_name, database_name, workgroup_name, sql_statement)
