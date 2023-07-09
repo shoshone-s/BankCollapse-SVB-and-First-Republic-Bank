@@ -46,7 +46,7 @@ def extract_companies():
     return companies
 
 # FIXME: This data is not being transformed or to a table in the database
-def extract_income_statement():
+def extract_financials():
     incst = pd.DataFrame()
     for symbol in symbols:
         time.sleep(20)
@@ -55,10 +55,6 @@ def extract_income_statement():
         incst_data = r.json()
         incst = pd.concat([incst, pd.concat([pd.DataFrame(incst_data['quarterlyReports']).assign(type='quarterly'), pd.DataFrame(incst_data['annualReports']).assign(type='annual')]).assign(symbol=symbol)])
 
-    return incst
-
-#FIXME: This data is not being transformed or to a table in the database
-def extract_balance_sheet():
     balsh = pd.DataFrame()
     for symbol in symbols:
         time.sleep(20)
@@ -67,10 +63,7 @@ def extract_balance_sheet():
         balsh_data = r.json()
         balsh = pd.concat([balsh, pd.concat([pd.DataFrame(balsh_data['quarterlyReports']).assign(type='quarterly'), pd.DataFrame(balsh_data['annualReports']).assign(type='annual')]).assign(symbol=symbol)])
 
-    return balsh
 
-# FIXME: This data is not being transformed or to a table in the database
-def extract_cashflow():
     cashflow = pd.DataFrame()
     for symbol in symbols:
         time.sleep(20)
@@ -79,9 +72,9 @@ def extract_cashflow():
         cashflow_data = r.json()
         cashflow = pd.concat([cashflow, pd.concat([pd.DataFrame(cashflow_data['quarterlyReports']).assign(type='quarterly'), pd.DataFrame(cashflow_data['annualReports']).assign(type='annual')]).assign(symbol=symbol)])
 
-    return cashflow
+    return pd.concat([balsh, incst, cashflow]).reset_index()
 
-# FIXME: This data is not being transformed or to a table in the database
+
 def extract_price_history():
     stock_prices = pd.DataFrame()
     for symbol in symbols:
@@ -103,7 +96,7 @@ def load_raw_companies():
     csv_file_name = SOURCE_NAME + '_' + dest_table_name + '.csv'
     s3_object_name= 'raw_data/' + csv_file_name
 
-    util.load_raw_data(companies_df, csv_file_name, s3_object_name)
+    util.load_raw_data(companies_df, csv_file_name)
 
 # FIXME: This data is not being transformed or to a table in the database
 def load_raw_income_statement():
@@ -111,15 +104,15 @@ def load_raw_income_statement():
     csv_file_name = "\\income_statement.csv"
     s3_object_name= 'raw_data/income_statement.csv'
 
-    util.load_raw_data(incst_df, csv_file_name, s3_object_name)
+    util.load_raw_data(incst_df, csv_file_name)
 
 # FIXME: This data is not being transformed or to a table in the database
-def load_raw_balance_sheet():
-    balsh_df = extract_balance_sheet()
+def load_raw_finacnials():
+    fin_df = extract_financials()
     csv_file_name = "\\alpha_vantange_financials.csv"
     s3_object_name= 'data/raw_data/alpha_vantange_financials.csv'
 
-    util.load_raw_data(balsh_df, csv_file_name, s3_object_name)
+    util.load_raw_data(fin_df, csv_file_name)
 
 # FIXME: This data is not being transformed or to a table in the database
 def load_raw_cashflow():
@@ -127,7 +120,7 @@ def load_raw_cashflow():
     csv_file_name = "\\cash_flow.csv"
     s3_object_name= 'raw_data/cash_flow.csv'
 
-    util.load_raw_data(cashflow_df, csv_file_name, s3_object_name)
+    util.load_raw_data(cashflow_df, csv_file_name)
 
 def load_raw_price_history():
     stock_prices = extract_price_history()
@@ -135,59 +128,11 @@ def load_raw_price_history():
     csv_file_name = SOURCE_NAME + "_" + dest_table_name + '.csv'
     s3_object_name= 'raw_data/' + csv_file_name 
 
-    util.load_raw_data(stock_prices, csv_file_name, s3_object_name)
+    util.load_raw_data(stock_prices, csv_file_name)
 
 ### END OF EXTRACT METHODS ###
 
 
-### TRANSFORM METHODS ###
-
-# TODO: Move transform methods to ./transform/
-
-def transform_price_history(): 
-
-    dest_table_name = 'price_history'
-    csv_file_name = SOURCE_NAME + dest_table_name + '.csv'
-    s3_object_name= 'raw_data/' + csv_file_name
-
-    av_stock_price = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name=s3_object_name)
-    av_stock_price.columns = [x.lower().replace(' ','_') for x in av_stock_price.columns]
-    av_stock_price['date'] = pd.to_datetime(av_stock_price['date'])
-
-    # keep stock data from Jan 2017 to Mar 2022
-    MIN_DATE = pd.Timestamp(2017,1,1)
-    MAX_DATE = pd.Timestamp(2022,3,31)
-    clean_av_stock_price = av_stock_price[['symbol', 'date', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
-    clean_av_stock_price = clean_av_stock_price[(clean_av_stock_price.date>=MIN_DATE) & (clean_av_stock_price.date<=MAX_DATE)]
-    clean_av_stock_price['volume'] = clean_av_stock_price['volume'].astype('Int64')
-
-    return clean_av_stock_price
-
-def load_clean_price_history():
-
-    clean_data_path = 'price_history.csv'
-    existing_object_name='clean_data/price_history.csv'
-    clean_av_stock_price = transform_price_history()
-
-    util.load_clean_data(clean_av_stock_price, clean_data_path, existing_object_name)
-
-def transform_companies():
-    dest_table_name = 'companies'
-    csv_file_name = SOURCE_NAME + dest_table_name + '.csv'
-    s3_object_name= 'raw_data/' + csv_file_name
-
-    av_companies = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name=s3_object_name)
-    av_companies.columns = [x.lower().replace(' ','_') for x in av_companies.columns]
-    av_companies.rename(columns={'symbol':'ticker'}, inplace=True)
-
-    return av_companies
-
-def load_clean_companies():
-    dest_table_name = 'companies'
-    csv_file_name = SOURCE_NAME + dest_table_name + '.csv'
-    s3_object_name= 'raw_data/' + csv_file_name
-
-### END TRANSFORM METHODS ###
 
 def extract(table_name='all'): 
     if table_name == 'all':

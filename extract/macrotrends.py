@@ -59,15 +59,9 @@ def load_raw_debt_to_equity():
     csv_file_name = "macrotrends_debt_to_equity.csv"
     s3_object_name= 'raw_data/macrotrends_debt_to_equity.csv'
 
-    util.load_raw_data(mt_df, csv_file_name, s3_object_name)
+    util.load_raw_data(mt_df, csv_file_name)
 
 
-### transform  methods
-def transform_debt_to_equity():
-    # get raw data from s3
-    df = aws_read_write.get_csv(bucket_name=util.S3_BUCKET_NAME, object_name='raw_data/macrotrends_debt_to_equity.csv')
-
-    # Make raw data columns match DebtToEquity table
 
 def load_clean_debt_to_equity():
 
