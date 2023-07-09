@@ -59,7 +59,7 @@ def load_raw_debt_to_equity():
     csv_file_name = "macrotrends_debt_to_equity.csv"
     s3_object_name= 'raw_data/macrotrends_debt_to_equity.csv'
 
-    load_raw_data(mt_df, csv_file_name, s3_object_name)
+    util.load_raw_data(mt_df, csv_file_name, s3_object_name)
 
 
 ### transform  methods
