@@ -78,9 +78,13 @@ def transform_companies():
     return av_companies
 
 def load_clean_companies():
-    dest_table_name = 'companies'
-    csv_file_name = SOURCE_NAME + dest_table_name + '.csv'
-    s3_object_name= 'raw_data/' + csv_file_name
+
+    clean_data_path = 'companies.csv'
+    existing_object_name='clean_data/companies.csv'
+    clean_av_stock_price = transform_companies()
+
+    util.load_clean_data(clean_av_stock_price, clean_data_path, existing_object_name)
+
 
 ### END TRANSFORM METHODS ###
 
