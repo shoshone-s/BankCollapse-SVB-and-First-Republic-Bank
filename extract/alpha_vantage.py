@@ -37,7 +37,7 @@ def extract_companies():
         companies = pd.concat([companies, pd.DataFrame([companies_data])])
     
     return companies
-# TODO: rename 
+
 def extract_income_statement():
     incst = pd.DataFrame()
     for symbol in symbols:

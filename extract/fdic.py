@@ -86,7 +86,6 @@ def extract_institutions():
         offset += limit
         time.sleep(5)
 
-# TODO: ADD TRANSFORM methods here
 
 def transform_locations(): 
     # selected banks from FDIC
