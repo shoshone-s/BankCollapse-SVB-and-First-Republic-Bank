@@ -93,7 +93,7 @@ def load_raw_sec_data():
 
     util.load_raw_data(sec_data_df, csv_file_name, s3_object_name)
 
-
+# TODO: check if this works... 
 def transform_sec_data():
     rename_cols = {
         'end': 'end_date',
