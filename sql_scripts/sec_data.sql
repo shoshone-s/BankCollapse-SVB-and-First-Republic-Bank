@@ -1,4 +1,5 @@
 CREATE TABLE IF NOT EXISTS sec_data (
+    ID int NOT NULL serial primary key,
     asset_num          VARCHAR(255),
     FOREIGN KEY (company_id) REFERENCES company(company_id),
     report_type        VARCHAR(255),

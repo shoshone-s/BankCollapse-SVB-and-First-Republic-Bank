@@ -121,7 +121,7 @@ def load_raw_stock_prices():
 
 # TODO: Move transform methods to ./transform/
 
-def transform(): 
+def transform_price_history(): 
     av_stock_price = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/stock_price_daily.csv')
     av_stock_price.columns = [x.lower().replace(' ','_') for x in av_stock_price.columns]
     av_stock_price['date'] = pd.to_datetime(av_stock_price['date'])
@@ -139,7 +139,7 @@ def load_clean_price_history():
 
     # Merge existing clean price history data in s3 with new data
     existing_price_history_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
-    clean_av_stock_price = transform()
+    clean_av_stock_price = transform_price_history()
 
     price_history = pd.concat([existing_price_history_df, clean_av_stock_price])
     

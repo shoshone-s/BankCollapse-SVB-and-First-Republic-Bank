@@ -13,6 +13,15 @@ cfg_data = configparser.ConfigParser()
 cfg_data.read("keys_config.cfg")
 S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
 
+TABLE_COLUMN_NAMES = {
+    'company': ['id', 'name', 'symbolid', 'FDICCertID', 'Class', 'Status'],
+    'debt_to_equity': ['ID', 'Date', 'LongTermDebt', 'DebtEquityRatio'],
+    'financials': ['report_date', 'total_assets', 'total_liabilities', 'total_debt', 'assets_return', 'equity_return', 'efficiency', 'risk_base_capital_ratio'],
+    'location': ['cert', 'company_name', 'main_office', 'branch_name', 'established_date', 'service_type', 'address', 'county', 'city', 'state', 'zip', 'latitude', 'longitude'],
+    'price_history': ['symbol', 'date', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume'],
+    'sec_data': ['ID', 'asset_num', 'company_id', 'report_type', 'start_date', 'end_date', 'date_filed', 'fiscal_year', 'fiscal_period', 'form', 'frame', 'value'],
+    'symbol': ['ID', 'TickerSymbol', 'Name'],
+}
 
 # location of data files
 data_path = os.path.join(os.getcwd(), "data_sources\data")

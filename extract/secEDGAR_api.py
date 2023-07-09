@@ -71,4 +71,15 @@ def secData(cik_str):
     # return res_payload.to_json(orient='records')[1:-1].replace('},{', '} {')
     return targetDataDicts
 
+def extract_sec_data():
+    pass 
+
+def load_raw_sec_data():
+    pass
+
+def transform_sec_data():
+    pass
+
+def load_clean_sec_data():
+    pass
 

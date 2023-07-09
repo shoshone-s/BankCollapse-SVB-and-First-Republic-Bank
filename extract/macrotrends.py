@@ -4,7 +4,7 @@ import urllib.request
 import pandas as pd
 import aws_read_write
 
-def extract():
+def extract_debt_to_equity():
     # url
     urlpage = 'https://www.macrotrends.net/stocks/charts/SIVBQ/svb-financial-group/debt-equity-ratio'
 
@@ -53,7 +53,14 @@ def extract():
 
     return df
 
-def load_raw_balance_sheet():
-    df = extract()
-    df.to_csv('macrotrends_balance_sheet.csv', index=False, header=False)
-    aws_read_write.upload_file(file_name=data_path + '\\macrotrends_balance_sheet.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/balance_sheet.csv')
+def load_raw_debt_to_equity():
+    df = extract_debt_to_equity()
+    df.to_csv('macrotrends_debt_to_equity.csv', index=False, header=False)
+    aws_read_write.upload_file(file_name=data_path + '\\macrotrends_debt_to_equity.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/balance_sheet.csv')
+
+### transform  methods
+def transform():
+    # get raw data from s3
+    df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/macrotrends_debt_to_equity.csv')
+
+    # Make raw data columns match DebtToEquity table
