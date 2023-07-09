@@ -91,7 +91,7 @@ def load_raw_sec_data():
     csv_file_name = "\\sec_data.csv"
     s3_object_name= 'raw_data/sec_data.csv'
 
-    util.load_raw_data(sec_data_df, csv_file_name, s3_object_name)
+    util.load_raw_data(sec_data_df, csv_file_name)
 
 
 def extract(table_name='all'):

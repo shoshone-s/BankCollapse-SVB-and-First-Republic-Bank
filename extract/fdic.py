@@ -98,7 +98,7 @@ def extract_institutions():
 
     return institutions
 
-# FIXME: institutions data does not get fed into any of our tables
+# FIXME: institutions data does not get fed into any of our tables --> goes into companies
 def load_raw_institutions():
     institutions = extract_institutions()
     institutions.columns = [x.replace('data.', '') for x in institutions.columns]
@@ -108,17 +108,15 @@ def load_raw_financials():
     stock_prices = extract_financials()
     dest_table_name = 'financials'
     csv_file_name = SOURCE_NAME + dest_table_name + '.csv'
-    s3_object_name= 'raw_data/' + csv_file_name
 
-    util.load_raw_data(stock_prices, csv_file_name, s3_object_name)
+    util.load_raw_data(stock_prices, csv_file_name)
 
 def load_raw_location():
     stock_prices = extract_location()
     dest_table_name = 'location'
     csv_file_name = SOURCE_NAME + dest_table_name + '.csv'
-    s3_object_name= 'raw_data/' + csv_file_name
 
-    util.load_raw_data(stock_prices, csv_file_name, s3_object_name)
+    util.load_raw_data(stock_prices, csv_file_name)
 
 ### END OF EXTRACT METHODS ###
 

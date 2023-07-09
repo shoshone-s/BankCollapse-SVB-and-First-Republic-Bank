@@ -21,35 +21,36 @@ IAM_REDSHIFT = cfg_data["Redshift"]["iam_role"]
 REDSHIFT_REGION_NAME = cfg_data["Redshift"]["region_name"]
 
 # Create a for loop that iterates through the list of files in the sql_scripts folder and executes each file in the Redshift database
-def load_to_redshift():
-    
-    for file in os.listdir("sql_scripts"):
-        if file.endswith(".sql"):
-            with open(os.path.join("sql_scripts", file), "r") as sql_file:
-                sql_table_name = str(file.split(".")[0])
-                sql_script = sql_file.read()
-                s3_obj_path = f"s3://ds4ateam20/clean_data/{sql_table_name}.csv"
+def load_to_redshift(sql_table_name):
+    sql_file = ''
+    sql_script = sql_file.read()
+    s3_obj_path = f"s3://ds4ateam20/clean_data/{sql_table_name}.csv"
 
-                aws_read_write.drop_table(
-                    region_name=REDSHIFT_REGION_NAME,
-                    database_name=REDSHIFT_DB_NAME,
-                    workgroup_name=REDSHIFT_WORKGROUP_NAME,
-                    table_name=sql_table_name)
+    # TODO: 
 
-                aws_read_write.execute_sql(
-                    region_name=REDSHIFT_REGION_NAME,
-                    database_name=REDSHIFT_DB_NAME,
-                    workgroup_name=REDSHIFT_WORKGROUP_NAME,
-                    sql_statement=sql_script)
+    """
+        check if it exists... drop if the columns don't match...
+    """
+    aws_read_write.drop_table(
+        region_name=REDSHIFT_REGION_NAME,
+        database_name=REDSHIFT_DB_NAME,
+        workgroup_name=REDSHIFT_WORKGROUP_NAME,
+        table_name=sql_table_name)
 
-                aws_read_write.copy_from_s3(
-                    database_name=REDSHIFT_DB_NAME,
-                    workgroup_name=REDSHIFT_WORKGROUP_NAME,
-                    table_name=sql_table_name,
-                    object_path=s3_obj_path,
-                    iam_role=IAM_REDSHIFT,
-                    region_name=REDSHIFT_REGION_NAME)
+    aws_read_write.execute_sql(
+        region_name=REDSHIFT_REGION_NAME,
+        database_name=REDSHIFT_DB_NAME,
+        workgroup_name=REDSHIFT_WORKGROUP_NAME,
+        sql_statement=sql_script)
 
-                print(f"Successfully loaded {sql_table_name} to Redshift")
+    aws_read_write.copy_from_s3(
+        database_name=REDSHIFT_DB_NAME,
+        workgroup_name=REDSHIFT_WORKGROUP_NAME,
+        table_name=sql_table_name,
+        object_path=s3_obj_path,
+        iam_role=IAM_REDSHIFT,
+        region_name=REDSHIFT_REGION_NAME)
+
+    print(f"Successfully loaded {sql_table_name} to Redshift")
 
 # load_to_redshift() 

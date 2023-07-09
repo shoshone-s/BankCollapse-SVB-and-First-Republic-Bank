@@ -1,3 +1,1 @@
-botocore
-boto3
-pandas
+yfinance --upgrade --no-cache-dir

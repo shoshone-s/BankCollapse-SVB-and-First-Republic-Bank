@@ -35,16 +35,6 @@ def load_clean_location():
 
     util.load_clean_data(clean_av_stock_price, clean_data_path, existing_object_name)
 
-def transform_financials():
-
-    dest_table_name = 'financials'
-    csv_file_name = SOURCE_NAME + dest_table_name + '.csv'
-    raw_s3_object_name= 'raw_data/' + csv_file_name
-
-    financials_df = aws_read_write.get_csv(bucket_name=util.S3_BUCKET_NAME, object_name=raw_s3_object_name)
-
-    pass 
-
 
 def load_clean_financials():
 
@@ -53,6 +43,8 @@ def load_clean_financials():
     clean_av_stock_price = transform_financials()
 
     util.load_clean_data(clean_av_stock_price, clean_data_path, existing_object_name)
+
+# TODO : add transform_companies() and load_clean_companies() methods
 
 ### END OF TRANSFORM METHODS ###
 

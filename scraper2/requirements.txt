@@ -1,0 +1,8 @@
+# Amazon SDK for Python
+boto3
+# Opening and reading files from the file system
+os 
+# Specifying the path from the OS
+pathlib
+# Reading .env variables from the filesystem if the AWS CLI is not being used for authentication
+python-dotenv
