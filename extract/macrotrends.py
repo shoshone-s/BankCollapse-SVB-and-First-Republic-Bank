@@ -55,3 +55,4 @@ def extract():
 def load():
     df = extract()
     df.to_csv('svb_debt.csv', index=False, header=False)
+    aws_read_write.upload_file(file_name=data_path + '\\balance_sheet.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/balance_sheet.csv')
