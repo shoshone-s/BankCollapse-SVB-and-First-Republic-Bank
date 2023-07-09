@@ -4,3 +4,6 @@
 
 # Ignore meta data files
 /__pycache__/
+
+# Ignnore airflow
+airflow/
