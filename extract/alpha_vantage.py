@@ -29,6 +29,8 @@ data_path = os.path.join(os.getcwd(), "data\clean_data")
 # pull data for these companies
 symbols = ['JPM', 'TD', 'BAC', 'C', 'WFC', 'BPOP', 'ALLY', 'NECB']
 
+### EXTRACT METHODS ###
+
 def extract_companies():
     companies = pd.DataFrame()
     for symbol in symbols:
@@ -90,9 +92,9 @@ def extract_stock_prices():
 def load_raw_companies():
     companies_df = extract_companies()
     companies_df.to_csv(data_path + "\\companies.csv", index=False)
-    aws_read_write.upload_file(file_name=data_path + '\\income_statement.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/income_statement.csv')
+    aws_read_write.upload_file(file_name=data_path + '\\companies.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/companies.csv')
 
-def load_rawincome_statement():
+def load_raw_income_statement():
     incst_df = extract_income_statement()
     incst_df.to_csv(data_path + "\\income_statement.csv", index=False)
     aws_read_write.upload_file(file_name=data_path + '\\income_statement.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/income_statement.csv')
@@ -112,7 +114,7 @@ def load_raw_stock_prices():
     stock_prices.to_csv(data_path + "\\stock_price_daily.csv", index=False)
     aws_read_write.upload_file(file_name=data_path + '\\stock_price_daily.csv', bucket_name=S3_BUCKET_NAME, object_name='raw_data/cash_flow.csv')
 
-
+### END OF EXTRACT METHODS ###
 
 
 ### TRANSFORM METHODS ###

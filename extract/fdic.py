@@ -10,6 +10,8 @@ cfg_data = configparser.ConfigParser()
 cfg_data.read("keys_config.cfg")
 S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
 
+### START OF EXTRACT METHODS ###
+
 def extract_locations():
     s = requests.Session()
     s.mount("https://", HTTPAdapter(max_retries=10))
@@ -23,6 +25,8 @@ def extract_locations():
         locations = pd.concat([locations, pd.json_normalize(r.json()['data'])])
         offset += limit
         time.sleep(5)
+
+    return locations
 
 
 def extract_financials(): 
@@ -87,6 +91,29 @@ def extract_institutions():
         offset += limit
         time.sleep(5)
 
+    return institutions
+
+
+def load_raw_institutions():
+    institutions = extract_institutions()
+    institutions.columns = [x.replace('data.', '') for x in institutions.columns]
+    institutions.to_csv('../../data/institutions.csv', index=False)
+
+
+def load_raw_financials():
+    financials_df = extract_financials()
+    # financials_df.to_parquet('../../data/financials.parquet') # FIXME: I don't think we need the paquet if we have the csv
+    financials_df.to_csv('../../data/financials.csv', index=False)
+
+def load_raw_locations():
+    locations = extract_locations()
+    locations.columns = [x.replace('data.', '') for x in locations.columns]
+    locations.to_csv('../../data/raw_data/locations.csv', index=False)
+
+
+### END OF EXTRACT METHODS ###
+
+### START OF TRANSFORM METHODS ###
 
 def transform_locations(): 
     # selected banks from FDIC
@@ -105,20 +132,7 @@ def transform_locations():
     aws_read_write.upload_file(file_name=data_path + '\\clean_locations.csv', bucket_name=S3_BUCKET_NAME, object_name='transformed_data/locations.csv')
 
 
-def load_institutions():
-    institutions = extract_institutions()
-    institutions.columns = [x.replace('data.', '') for x in institutions.columns]
-    institutions.to_csv('../../data/institutions.csv', index=False)
+### END OF TRANSFORM METHODS ###
 
-
-def load_financials():
-    financials_df = extract_financials()
-    financials_df.to_parquet('../../data/financials.parquet')
-    financials_df.to_csv('../../data/financials.csv', index=False)
-
-def load_locations():
-    locations = extract_locations()
-    locations.columns = [x.replace('data.', '') for x in locations.columns]
-    locations.to_csv('../../data/raw_data/locations.csv', index=False)
 
 
