@@ -3,6 +3,7 @@ from pandas.tseries.offsets import QuarterEnd
 import requests
 from requests.adapters import HTTPAdapter
 import time
+import aws_read_write
 
 # read credentials from the config file
 cfg_data = configparser.ConfigParser()

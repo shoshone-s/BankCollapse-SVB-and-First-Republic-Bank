@@ -24,7 +24,7 @@ def upload_file(file_name, bucket_name, object_name):
         print("Successful S3 upload_file response.")
     except ClientError as e:
         print("Unsuccessful S3 upload_file response.")
-        logging.error(e)
+        print(e)
 
 
 def get_file(bucket_name, object_name):
