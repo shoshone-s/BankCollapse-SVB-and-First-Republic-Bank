@@ -27,6 +27,7 @@ import pendulum
 
 import extract
 import transform
+import load
 
 from airflow.decorators import dag, task
 
@@ -36,16 +37,14 @@ from airflow.decorators import dag, task
 # [START instantiate_dag]
 @dag(
     schedule=None,
-    start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
+    start_date=pendulum.datetime(2022, 1, 1, tz="UTC"),
     catchup=False,
     tags=["our_dag"],
 )
 def tutorial_taskflow_api():
     """
     ### TaskFlow API Tutorial Documentation
-    This is a simple data pipeline example which demonstrates the use of
-    the TaskFlow API using three simple tasks for Extract, Transform, and Load.
-    Documentation that goes along with the Airflow TaskFlow API tutorial is
+    This data pipeline is based on the Airflow TaskFlow API tutorial is
     located
     [here](https://airflow.apache.org/docs/apache-airflow/stable/tutorial_taskflow_api.html)
     """
@@ -53,7 +52,7 @@ def tutorial_taskflow_api():
 
     # [START extract]
     @task()
-    def extract():
+    def extract_all():
         """
         #### Extract task
         Extract the data from all data sources and load into s3 bucket
@@ -67,30 +66,35 @@ def tutorial_taskflow_api():
 
     # [END extract]
 
-    # # [START transform]
-    # @task(multiple_outputs=True)
-    # def transform(order_data_dict: dict):
-    #     """
-    #     #### Transform task
-    #     A simple Transform task which takes in the collection of order data and
-    #     computes the total order value.
-    #     """
-    #     transform_all()
+    # [START transform]
+    @task(multiple_outputs=True)
+    def transform_all():
+        """
+        #### Transform task
+        A simple Transform task which takes in the collection of order data and
+        computes the total order value.
+        """
+        transform.market_watch.transform()
+        transform.fdic.transform()
+        transform.secEDGAR_api.transform()
+        transform.y_finance.transform()
+        transform.macrotrends.transform()
+        transform.alpha_vantage.transform()
 
     # # [END transform]
 
-    # # [START load]
-    # @task()
-    # def load(total_order_value: float):
-    #     """
-    #     #### Load task
-    #     A simple Load task which takes in the result of the Transform task and
-    #     instead of saving it to end user review, just prints it out.
-    #     """
+    # [START load]
+    @task()
+    def load_all():
+        """
+        #### Load task
+        A simple Load task which takes in the result of the Transform task and
+        instead of saving it to end user review, just prints it out.
+        """
 
-    #     print(f"Total order value is: {total_order_value:.2f}")
+        load.load_to_redshift() 
 
-    # # [END load]
+    # [END load]
 
     # # # [START main_flow]
     # # order_data = extract()
@@ -98,7 +102,10 @@ def tutorial_taskflow_api():
     # # load(order_summary["total_order_value"])
     # # # [END main_flow]
 
-    extract()
+    extract_all()
+    transform_all()
+    load_all()
+
 
 
 

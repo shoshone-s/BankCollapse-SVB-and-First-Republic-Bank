@@ -42,3 +42,10 @@ def load_clean_sec_data():
 
     util.load_clean_data(new_clean_df, clean_data_path, clean_data_object_name)
 
+def transform(table_name='all'):
+    if table_name == 'all':
+        load_clean_sec_data()
+    elif table_name == 'sec_data':
+        load_clean_sec_data()
+    else:
+        print('Invalid table name')

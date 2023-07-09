@@ -37,3 +37,11 @@ def load_clean_price_history():
 
     util.load_clean_data(djusbank, clean_data_path, existing_object_name)
 ### END OF TRANSFORM METHODS ###
+
+def transform(table_name='all'):
+    if table_name == 'all':
+        load_clean_price_history()
+    elif table_name == 'price_history':
+        load_clean_price_history()
+    else:
+        print("Invalid table name.")

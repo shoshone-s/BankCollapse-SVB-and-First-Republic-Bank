@@ -83,3 +83,14 @@ def load_clean_companies():
     s3_object_name= 'raw_data/' + csv_file_name
 
 ### END TRANSFORM METHODS ###
+
+def transform(table_name='all'):
+    if table_name == 'all':
+        load_clean_price_history()
+        load_clean_companies()
+    elif table_name == 'price_history':
+        load_clean_price_history()
+    elif table_name == 'companies':
+        load_clean_companies()
+    else:
+        print("Invalid table name.")

@@ -52,4 +52,4 @@ def load_to_redshift():
 
                 print(f"Successfully loaded {sql_table_name} to Redshift")
 
-load_to_redshift() 
+# load_to_redshift() 

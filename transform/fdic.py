@@ -56,5 +56,13 @@ def load_clean_financials():
 
 ### END OF TRANSFORM METHODS ###
 
-
-
+def transform(table_name='all'):
+    if table_name == 'all':
+        load_clean_location()
+        load_clean_financials()
+    elif table_name == 'location':
+        load_clean_location()
+    elif table_name == 'financials':
+        load_clean_financials()
+    else:
+        print("Invalid table name.")
