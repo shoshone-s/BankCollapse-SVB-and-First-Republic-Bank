@@ -82,7 +82,7 @@ def extract_cashflow():
     return cashflow
 
 # FIXME: This data is not being transformed or to a table in the database
-def extract_stock_prices():
+def extract_price_history():
     stock_prices = pd.DataFrame()
     for symbol in symbols:
         time.sleep(20)
@@ -130,10 +130,10 @@ def load_raw_cashflow():
     util.load_raw_data(cashflow_df, csv_file_name, s3_object_name)
 
 def load_raw_price_history():
-    stock_prices = extract_stock_prices()
+    stock_prices = extract_price_history()
     dest_table_name = 'price_history'
     csv_file_name = SOURCE_NAME + "_" + dest_table_name + '.csv'
-    s3_object_name= 'raw_data/' + "testingtestingtesting"+ csv_file_name 
+    s3_object_name= 'raw_data/' + csv_file_name 
 
     util.load_raw_data(stock_prices, csv_file_name, s3_object_name)
 
@@ -189,16 +189,22 @@ def load_clean_companies():
 
 ### END TRANSFORM METHODS ###
 
-load_raw_price_history()
-
-# q: Why do i get this error when i run this file?
-# A: You need to run this file from the root directory of the project
-
-#q: How can i access /Users/naledikekana/BankCollapse-SVB-and-First-Republic-Bank/aws_read_write.py from this file?
-#A: You need to run this file from the root directory of the project
-
-#q: how can i run this file from the root directory of the project?
-#A: python extract/alpha_vantage.py
-
-#q: that didn't work
-#A: python -m extract.alpha_vantage
+def extract(table_name='all'): 
+    if table_name == 'all':
+        load_raw_companies()
+        load_raw_income_statement()
+        load_raw_balance_sheet()
+        load_raw_cashflow()
+        load_raw_price_history()
+    elif table_name == 'companies':
+        load_raw_companies()
+    elif table_name == 'income_statement':
+        load_raw_income_statement()
+    elif table_name == 'balance_sheet':
+        load_raw_balance_sheet()
+    elif table_name == 'cashflow':
+        load_raw_cashflow()
+    elif table_name == 'price_history':
+        load_raw_price_history()
+    else:
+        print('Invalid table name')

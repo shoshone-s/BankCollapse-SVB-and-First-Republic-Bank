@@ -76,3 +76,11 @@ def load_clean_debt_to_equity():
     clean_av_stock_price = transform_debt_to_equity()
 
     util.load_clean_data(clean_av_stock_price, clean_data_path, existing_object_name)
+
+def extract(table_name='all'):
+    if table_name == 'all':
+        load_raw_debt_to_equity()
+    elif table_name == 'debt_to_equity':
+        load_raw_debt_to_equity()
+    else:
+        print('Invalid table name')

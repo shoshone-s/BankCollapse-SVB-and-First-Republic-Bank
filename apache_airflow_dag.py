@@ -25,6 +25,9 @@ import pendulum
 
 from transform.transform import transform_all
 
+import extract
+import transform
+
 from airflow.decorators import dag, task
 
 # [END import_module]
@@ -53,14 +56,14 @@ def BaseDataSource():
     def extract():
         """
         #### Extract task
-        A simple Extract task to get data ready for the rest of the data
-        pipeline. In this case, getting data is simulated by reading from a
-        hardcoded JSON string.
+        Extract the data from all data sources and load into s3 bucket
         """
-        data_string = '{"1001": 301.27, "1002": 433.21, "1003": 502.22}'
-
-        order_data_dict = json.loads(data_string)
-        return order_data_dict
+        extract.market_watch.extract()
+        extract.fdic.extract()
+        extract.secEDGAR_api.extract()
+        extract.y_finance.extract()
+        extract.macrotrends.extract()
+        extract.alpha_vantage.extract()
 
     # [END extract]
 
@@ -89,11 +92,15 @@ def BaseDataSource():
 
     # [END load]
 
-    # [START main_flow]
-    order_data = extract()
-    order_summary = transform(order_data)
-    load(order_summary["total_order_value"])
-    # [END main_flow]
+    # # [START main_flow]
+    # order_data = extract()
+    # order_summary = transform(order_data)
+    # load(order_summary["total_order_value"])
+    # # [END main_flow]
+
+    extract()
+
+
 
 
 # [START dag_invocation]
