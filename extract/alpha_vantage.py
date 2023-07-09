@@ -100,7 +100,7 @@ def load_raw_companies():
     companies_df = extract_companies()
 
     dest_table_name = 'companies'
-    csv_file_name = SOURCE_NAME + dest_table_name + '.csv'
+    csv_file_name = SOURCE_NAME + '_' + dest_table_name + '.csv'
     s3_object_name= 'raw_data/' + csv_file_name
 
     util.load_raw_data(companies_df, csv_file_name, s3_object_name)
@@ -116,8 +116,8 @@ def load_raw_income_statement():
 # FIXME: This data is not being transformed or to a table in the database
 def load_raw_balance_sheet():
     balsh_df = extract_balance_sheet()
-    csv_file_name = "\\balance_sheet.csv"
-    s3_object_name= 'raw_data/balance_sheet.csv'
+    csv_file_name = "\\alpha_vantange_financials.csv"
+    s3_object_name= 'data/raw_data/alpha_vantange_financials.csv'
 
     util.load_raw_data(balsh_df, csv_file_name, s3_object_name)
 

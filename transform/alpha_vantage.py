@@ -86,6 +86,7 @@ def load_clean_companies():
     util.load_clean_data(clean_av_stock_price, clean_data_path, existing_object_name)
 
 
+
 ### END TRANSFORM METHODS ###
 
 def transform(table_name='all'):

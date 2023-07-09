@@ -98,7 +98,7 @@ def extract_institutions():
 
     return institutions
 
-# FIXME: institutions data does not get fed into any of our tables
+# FIXME: institutions data does not get fed into any of our tables --> goes into companies
 def load_raw_institutions():
     institutions = extract_institutions()
     institutions.columns = [x.replace('data.', '') for x in institutions.columns]

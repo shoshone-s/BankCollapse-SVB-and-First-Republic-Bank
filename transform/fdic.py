@@ -54,6 +54,18 @@ def load_clean_financials():
 
     util.load_clean_data(clean_av_stock_price, clean_data_path, existing_object_name)
 
+# TODO : add transform_companies() and load_clean_companies() methods
+
+def transform_companies():
+    dest_table_name = 'companies'
+    csv_file_name = SOURCE_NAME + dest_table_name + '.csv'
+    s3_object_name= 'raw_data/' + csv_file_name
+
+    # TODO: Merge with Angel's changes
+
+    
+    return av_companies
+
 ### END OF TRANSFORM METHODS ###
 
 def transform(table_name='all'):
