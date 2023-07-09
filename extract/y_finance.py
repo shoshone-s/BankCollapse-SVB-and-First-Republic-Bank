@@ -12,10 +12,10 @@ STOCKS_IN_SCOPE = [
     'SBNY', # Silicon Valley Bank
 ]
 
-# read credentials from the config file
-cfg_data = configparser.ConfigParser()
-cfg_data.read("keys_config.cfg")
-S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
+# # read credentials from the config file
+# cfg_data = configparser.ConfigParser()
+# cfg_data.read("keys_config.cfg")
+# S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
 
 def extract_price_history(): 
     if len(STOCKS_IN_SCOPE) > 1:
