@@ -1,4 +1,5 @@
-from flask import Flask
+from flask import Flask, jsonify
+from data_sources.scripts.api_scripts import secEDGAR_api
 
 app = Flask(__name__)
 
@@ -16,9 +17,9 @@ def get_price_history():
 def get_symbol():
     return 'this will return a json object of the symbol table'
 
-@app.route('/locations')
-def get_locations():
-    return 'this will return a json object of the locations table'
+@app.route('/location')
+def get_location():
+    return 'this will return a json object of the location table'
 
 @app.route('/financials')
 def get_financials():
@@ -28,12 +29,19 @@ def get_financials():
 def get_company():
     return 'this will return a json object of the company table'
 
-@app.route('/secdata')
-def index():
-    return 'this will return a json object of the secdata table'
+@app.route('/secdata/ticker=<ticker_symbol>')
+def get_secData(ticker_symbol):
+    cfg_head = secEDGAR_api.headers
+    tickerInfo = secEDGAR_api.companyTickerData(cfg_head, ticker_symbol)
+    data = secEDGAR_api.secData(tickerInfo['cik_str'])
+    return jsonify(data)
 
 @app.route('/')
 def home():
     return 'Team 20 API'
 
-app.run(host='0.0.0.0', port=81)
+# uncomment when deploying to prod
+# app.run(host='0.0.0.0', port=81)
+
+if __name__=='__main__':
+    app.run(debug=True)
