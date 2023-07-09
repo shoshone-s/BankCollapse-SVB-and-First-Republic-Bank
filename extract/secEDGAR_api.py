@@ -6,6 +6,9 @@ import pandas as pd
 import os
 import time
 import csv
+import util
+import aws_read_write
+
 from dotenv import load_dotenv, dotenv_values
 load_dotenv()
 
@@ -86,7 +89,10 @@ def extract_sec_data():
     return sec_df.reset_index()
 
 def load_raw_sec_data():
-    pass
+    sec_data_df = extract_sec_data()
+    sec_data_df.to_csv(data_path + "\\sec_data.csv", index=False)
+    aws_read_write.upload_file(file_name=data_path + '\\sec_data.csv', bucket_name=util.S3_BUCKET_NAME, object_name='raw_data/sec_data.csv')
+
 
 def transform_sec_data():
     rename_cols = {
@@ -108,5 +114,14 @@ def transform_sec_data():
     return clean_sec_df
 
 def load_clean_sec_data():
-    pass
+    # Merge existing clean price history data in s3 with new data
+    existing_price_history_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
+    clean_av_stock_price = transform_price_history()
+
+    price_history = pd.concat([existing_price_history_df, clean_av_stock_price])
+    
+    # save data to csv and upload data to S3 bucket
+    price_history.to_csv(data_path + "\\price_history.csv", index=False)
+    aws_read_write.upload_file(file_name=data_path + '\\price_history.csv', bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
+
 

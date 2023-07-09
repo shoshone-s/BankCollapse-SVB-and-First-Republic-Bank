@@ -8,6 +8,7 @@ import time
 import os
 import configparser
 import aws_read_write
+import util
 
 
 # read credentials from the config file
@@ -138,14 +139,10 @@ def transform_price_history():
 def load_clean_price_history():
 
     # Merge existing clean price history data in s3 with new data
-    existing_price_history_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
+    existing_object_name='clean_data/price_history.csv'
     clean_av_stock_price = transform_price_history()
 
-    price_history = pd.concat([existing_price_history_df, clean_av_stock_price])
-    
-    # save data to csv and upload data to S3 bucket
-    price_history.to_csv(data_path + "\\price_history.csv", index=False)
-    aws_read_write.upload_file(file_name=data_path + '\\price_history.csv', bucket_name=S3_BUCKET_NAME, object_name='transformed_data/price_history.csv')
+    util.load_clean_data(clean_av_stock_price, clean_data_path, existing_object_name)
 
 
 ### END TRANSFORM METHODS ###

@@ -28,7 +28,7 @@ def load_to_redshift():
             with open(os.path.join("sql_scripts", file), "r") as sql_file:
                 sql_table_name = str(file.split(".")[0])
                 sql_script = sql_file.read()
-                s3_obj_path = f"s3://ds4ateam20/transformed_data/{sql_table_name}.csv"
+                s3_obj_path = f"s3://ds4ateam20/clean_data/{sql_table_name}.csv"
 
                 aws_read_write.drop_table(
                     region_name=REDSHIFT_REGION_NAME,

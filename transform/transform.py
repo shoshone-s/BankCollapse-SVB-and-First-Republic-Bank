@@ -47,7 +47,7 @@ def transform_price_history():
 
     # save data to csv and upload data to S3 bucket
     clean_price_history.to_csv(data_path + "\\clean_price_history.csv", index=False)
-    aws_read_write.upload_file(file_name=data_path + '\\clean_price_history.csv', bucket_name=S3_BUCKET_NAME, object_name='transformed_data/price_history.csv')
+    aws_read_write.upload_file(file_name=data_path + '\\clean_price_history.csv', bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
 
 
 transform_price_history()
