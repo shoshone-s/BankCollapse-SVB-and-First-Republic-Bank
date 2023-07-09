@@ -23,6 +23,8 @@ def load_raw_data(raw_df, csv_file_name, s3_object_name):
 
     csv_file_name= RAW_DATA_PATH +  csv_file_name
 
+    s3_object_name = 'data/' + s3_object_name
+
     raw_df.to_csv(csv_file_name, index=False)
     aws_read_write.upload_file(file_name=csv_file_name, bucket_name=S3_BUCKET_NAME, object_name= s3_object_name)
 
@@ -32,6 +34,8 @@ def load_clean_data(new_clean_df, clean_data_path, clean_data_object_name):
     existing_obj_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name=clean_data_object_name)
     
     new_obj_df = pd.concat([existing_obj_df, new_clean_df])
+    s3_object_name = 'data/' + s3_object_name
+
     
     # save data to csv and upload data to S3 bucket
     new_obj_df.to_csv(clean_data_path, index=False)
