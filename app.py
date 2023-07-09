@@ -17,9 +17,9 @@ def get_price_history():
 def get_symbol():
     return 'this will return a json object of the symbol table'
 
-@app.route('/locations')
-def get_locations():
-    return 'this will return a json object of the locations table'
+@app.route('/location')
+def get_location():
+    return 'this will return a json object of the location table'
 
 @app.route('/financials')
 def get_financials():

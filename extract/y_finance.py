@@ -1,6 +1,7 @@
 import yfinance as yf
 import pandas as pd
 import aws_read_write
+import util
 
 """
     Description : Retreives high, low, open, close, and adjusted close price, as well as volume for any stock ticker with yfinacne library
@@ -16,7 +17,7 @@ cfg_data = configparser.ConfigParser()
 cfg_data.read("keys_config.cfg")
 S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
 
-def extract(): 
+def extract_price_history(): 
     if len(STOCKS_IN_SCOPE) > 1:
         companies_str = str(" ".join(STOCKS_IN_SCOPE))
     elif len(STOCKS_IN_SCOPE) == 1: 
@@ -25,8 +26,6 @@ def extract():
         companies_str = ""
 
     data = yf.download(companies_str, period='max', interval='1m').reset_index()
-
-    print(data.columns)
 
     # augment so that it give the min for each date
 
@@ -41,19 +40,22 @@ def extract():
     return df 
 
 def load_raw_price_history(): 
-    df = extract() 
-    df.to_csv("yfinance.csv")
+    raw_df = extract_price_history() 
+    csv_file_name = "\\yfinance_price_history.csv"
+    s3_object_name= 'raw_data/yfinance_price_history.csv'
+
+    util.load_raw_data(raw_df, csv_file_name, s3_object_name)
 
 #TODO : Add transform 
 
-def transform(): 
-    yf_stock_price = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/price_history.csv').drop(columns=['Unnamed: 0'])
+def transform_price_history(): 
+    yf_stock_price = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/yfinance_price_history.csv').drop(columns=['Unnamed: 0'])
     yf_stock_price.columns = [x.lower().replace(' ','_') for x in yf_stock_price.columns]
     yf_stock_price.rename(columns={'datetime':'date', 'adj_close':'adjusted_close'}, inplace=True)
     yf_stock_price['symbol'] = 'SIVBQ'
     yf_stock_price['date'] = pd.to_datetime(yf_stock_price['date']) 
 
-        # keep stock data from Jan 2017 to Mar 2022
+    # keep stock data from Jan 2017 to Mar 2022
     MIN_DATE = pd.Timestamp(2017,1,1)
     MAX_DATE = pd.Timestamp(2022,3,31)
     yf_stock_price = yf_stock_price[['symbol', 'date', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
@@ -64,15 +66,11 @@ def transform():
 
 def load_clean_price_history():
 
-    # Merge existing clean price history data in s3 with new data
-    existing_price_history_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
-    clean_yf_stock_price = transform()
+    clean_data_path = 'price_history.csv'
+    existing_object_name='clean_data/price_history.csv'
+    clean_av_stock_price = transform_price_history()
 
-    price_history = pd.concat([existing_price_history_df, clean_yf_stock_price])
-    data_path = '../data/clean_data/price_history.csv'
-    # save data to csv and upload data to S3 bucket
-    price_history.to_csv(data_path + "\\price_history.csv", index=False)
-    aws_read_write.upload_file(file_name=data_path + '\\price_history.csv', bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
+    util.load_clean_data(clean_av_stock_price, clean_data_path, existing_object_name)
 
 
 ### END TRANSFORM METHODS ###

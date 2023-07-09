@@ -13,7 +13,7 @@ S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
 # location of data files
 data_path = os.path.join(os.getcwd(), "data_sources\data")
 
-def extract_dow_jones_us_banks_index(): 
+def extract_price_history(): 
     start_year = 2017
     end_year = pd.Timestamp.now().year
     historical_quotes = pd.DataFrame()
@@ -33,23 +33,23 @@ def extract_dow_jones_us_banks_index():
     return historical_quotes
 
 
-def load_dow_jones_us_banks_index():
+def load_market_watch():
 
     # Eventually goes to price history 
     
-    historical_quotes = extract_dow_jones_us_banks_index()
+    historical_quotes = extract_price_history()
 
     # save data to csv
-    historical_quotes.to_csv(data_path + "\\dow_jones_us_banks_index.csv", index=False)
+    historical_quotes.to_csv(data_path + "\\market_watch.csv", index=False)
     # upload data to S3 bucket
-    aws_read_write.upload_file(file_name=data_path + '\\dow_jones_us_banks_index.csv', bucket_name=util.S3_BUCKET_NAME, object_name='raw_data/dow_jones_us_banks_index.csv')
+    aws_read_write.upload_file(file_name=data_path + '\\market_watch.csv', bucket_name=util.S3_BUCKET_NAME, object_name='raw_data/market_watch.csv')
 
 ### END OF EXTRACT METHODS ###
 
 ### BEGIN TRANSFORM METHODS ###
 
-def transform(): 
-    djusbank = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/dow_jones_us_banks_index.csv')
+def transform_price_history(): 
+    djusbank = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='raw_data/market_watch.csv')
     djusbank.columns = [x.lower() for x in djusbank.columns]
     djusbank.rename(columns={'ticker':'symbol'}, inplace=True)
     djusbank['date'] = pd.to_datetime(djusbank['date']) 
@@ -65,14 +65,9 @@ def transform():
 
 def load_clean_price_history():
 
-    # Merge existing clean price history data in s3 with new data
-    existing_price_history_df = aws_read_write.get_csv(bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
-    djusbank = transform()
+    clean_data_path = 'price_history.csv'
+    existing_object_name='clean_data/price_history.csv'
+    djusbank = transform_price_history()
 
-    price_history = pd.concat([existing_price_history_df, djusbank])
-    
-    # save data to csv and upload data to S3 bucket
-    price_history.to_csv(data_path + "\\price_history.csv", index=False)
-    aws_read_write.upload_file(file_name=data_path + '\\price_history.csv', bucket_name=S3_BUCKET_NAME, object_name='clean_data/price_history.csv')
-    
+    util.load_clean_data(djusbank, clean_data_path, existing_object_name)
 ### END OF TRANSFORM METHODS ###
