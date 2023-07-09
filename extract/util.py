@@ -18,7 +18,7 @@ AV_API_KEY = cfg_data["AlphaVantage"]["api_key"]
 CLEAN_DATA_PATH = os.path.join(os.getcwd(), "data\clean_data")
 RAW_DATA_PATH = os.path.join(os.getcwd(), "data\\raw_data")
 
-def load_raw_data(raw_df, csv_file_name, s3_object_name, data_source_name):
+def load_raw_data(raw_df, csv_file_name, s3_object_name):
     # csv_file_name = SOURCE_NAME + "_" + dest_table_name + '.csv'
 
     csv_file_name= RAW_DATA_PATH +  csv_file_name
