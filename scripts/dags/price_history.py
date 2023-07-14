@@ -20,7 +20,6 @@ QUEUE_URL = f"https://sqs.us-east-2.amazonaws.com/{util.AWS_ACCOUNT_ID}/{util.SQ
 
 @dag(
     schedule=None,
-    depends_on_past=False,
     start_date=pendulum.datetime(2023, 7, 1, tz="UTC"),
     catchup=False,
     tags=["our_dag"],
