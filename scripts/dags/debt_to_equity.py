@@ -14,7 +14,7 @@ from redshift_load_data import load_to_redshift
 
 
 TABLE_NAME = "debt_to_equity"
-QUEUE_URL = f"https://sqs.us-east-2.amazonaws.com/{util.AWS_ACCOUNT_ID}/{util.QUEUE_NAME}"
+QUEUE_URL = f"https://sqs.us-east-2.amazonaws.com/{util.AWS_ACCOUNT_ID}/{util.SQS_QUEUE_NAME}"
 
 @dag(
     schedule=None,
