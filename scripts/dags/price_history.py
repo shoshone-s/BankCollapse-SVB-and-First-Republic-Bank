@@ -16,7 +16,7 @@ from redshift_load_data import load_to_redshift
 
 
 TABLE_NAME = "price_history"
-QUEUE_URL = f"https://sqs.us-east-2.amazonaws.com/{util.ACCOUNT_ID}/{util.QUEUE_NAME}"
+QUEUE_URL = f"https://sqs.us-east-2.amazonaws.com/{util.AWS_ACCOUNT_ID}/{util.QUEUE_NAME}"
 
 @dag(
     schedule=None,
