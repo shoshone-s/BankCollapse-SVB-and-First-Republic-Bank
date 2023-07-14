@@ -5,8 +5,9 @@ import pendulum
 from pathlib import Path
 import sys
 scripts_path = Path(__file__).resolve().parents[1]
-sys.path += [str(scripts_path), str(scripts_path / "extract"), str(scripts_path / "transform"), str(scripts_path / "load")]
+sys.path += [str(scripts_path / "utilities"), str(scripts_path), str(scripts_path / "extract"), str(scripts_path / "transform"), str(scripts_path / "load")]
 
+import util
 import alpha_vantage
 import fdic
 import company

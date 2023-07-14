@@ -1,69 +1,81 @@
 from __future__ import annotations
 
-import json
-import os
-
-import extract
-import load
-import pendulum
-import transform
 from airflow.decorators import dag, task
+import pendulum
+from pathlib import Path
+import sys
+scripts_path = Path(__file__).resolve().parents[1]
+sys.path += [str(scripts_path / "utilities"), str(scripts_path), str(scripts_path / "extract"), str(scripts_path / "transform"), str(scripts_path / "load")]
 
+import util
+import sec_edgar
+import sec_data
+from redshift_load_data import load_to_redshift
+
+
+TABLE_NAME = "sec_data"
+QUEUE_URL = f"https://sqs.us-east-2.amazonaws.com/{util.ACCOUNT_ID}/{util.QUEUE_NAME}"
 
 @dag(
     schedule=None,
-    start_date=pendulum.datetime(2022, 1, 1, tz="UTC"),
+    depends_on_past=False,
+    start_date=pendulum.datetime(2023, 7, 1, tz="UTC"),
     catchup=False,
     tags=["our_dag"],
 )
 def sec_data_importer():
     """
-    ### TaskFlow API Tutorial Documentation
-    This data pipeline is based on the Airflow TaskFlow API tutorial is
-    located
-    [here](https://airflow.apache.org/docs/apache-airflow/stable/tutorial_taskflow_api.html)
+    ### ETL for SEC data
     """
     # [END instantiate_dag]
 
     # [START extract]
     @task()
-    def extract_all():
+    def extract():
         """
         #### Extract task
-        Extract the data from all data sources and load into s3 bucket
+        Extract the data from all data sources and load into S3 bucket / raw_data
         """
-        
-        extract.market_watch.load_raw_sec_data()
-        extract.fdic.load_raw_sec_data()
-        extract.secEDGAR_api.load_raw_sec_data()
-        extract.y_finance.load_raw_sec_data()
-        extract.macrotrends.load_raw_sec_data()
-        extract.alpha_vantage.load_raw_sec_data()
+        sec_edgar.extract(table_name=TABLE_NAME)
 
-    @task(multiple_outputs=True)
+    @task()
     def transform():
         """
         #### Transform task
-        A simple Transform task which takes in the collection of order data and
-        computes the total order value.
+        Clean data and load int S3 bucket / transformed_data
         """
-        transform.sec_data.load_clean_data()
+        sec_data.transform(table_name=TABLE_NAME)
 
     @task()
-    def load_all():
+    def load():
         """
         #### Load task
-        A simple Load task which takes in the result of the Transform task and
-        instead of saving it to end user review, just prints it out.
+        Copy clean data from S3 to Redshift
         """
-        table_name = 'sec_data'
-        load.load_to_redshift(table_name) 
+        load_to_redshift(sql_table_name=TABLE_NAME)
+        
+    @task()
+    def wait_raw_data():
+        s3_sensor_raw_data_fdic = SqsSensor(
+            sqs_queue=QUEUE_URL,
+            message_filtering='literal',
+            message_filtering_match_values=f"data/raw_data/{TABLE_NAME}.csv"
+        )
+
+    @task()
+    def wait_clean_data():
+        s3_sensor_transformed_data = SqsSensor(
+            sqs_queue=QUEUE_URL,
+            message_filtering='literal',
+            message_filtering_match_values=f"data/transformed_data/{TABLE_NAME}.csv"
+        )
 
     # [END load]
 
     extract()
+    wait_raw_data()
     transform()
+    wait_clean_data()
     load()
 
 sec_data_importer()
-
