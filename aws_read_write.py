@@ -125,19 +125,33 @@ def drop_table(region_name, database_name, workgroup_name, table_name):
 
 # populate table with data from S3
 def copy_from_s3(region_name, database_name, workgroup_name, table_name, object_path, iam_role):
-    sql_statement = f"""
+    if '.parquet' in object_path:
+        sql_statement = f"""
         COPY {table_name} 
         FROM '{object_path}' 
         IAM_ROLE '{iam_role}' 
         REGION '{region_name}' 
-        CSV 
-        DELIMITER ',' 
-        BLANKSASNULL 
-        EMPTYASNULL 
-        IGNOREBLANKLINES 
-        IGNOREHEADER 1 
-        ROUNDEC 
-        TRIMBLANKS 
-        ;
-    """
-    execute_sql(region_name, database_name, workgroup_name, sql_statement)
+        FORMAT AS PARQUET 
+        FILLRECORD
+            ;
+        """
+        execute_sql(region_name, database_name, workgroup_name, sql_statement)
+    else:
+        sql_statement = f"""
+            COPY {table_name} 
+            FROM '{object_path}' 
+            IAM_ROLE '{iam_role}' 
+            REGION '{region_name}' 
+            CSV 
+            DELIMITER ',' 
+            BLANKSASNULL 
+            EMPTYASNULL 
+            DATEFORMAT 'auto'
+            IGNOREBLANKLINES 
+            IGNOREHEADER 1 
+            ROUNDEC 
+            TRIMBLANKS
+            FILLRECORD
+            ;
+        """
+        execute_sql(region_name, database_name, workgroup_name, sql_statement)

@@ -1,5 +1,23 @@
 from flask import Flask, jsonify
 from data_sources.scripts.api_scripts import secEDGAR_api
+import os
+import configparser
+from dotenv import dotenv_values
+import redshift_connector
+
+# read credentials from the config file
+cfg_data = configparser.ConfigParser()
+cfg_data.read("keys_config.cfg")
+
+AWS_ACCESS_KEY_ID = cfg_data["AWS"]["access_key_id"]
+AWS_SECRET_ACCESS_KEY = cfg_data["AWS"]["secret_access_key"]
+
+S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
+
+REDSHIFT_DB_NAME = cfg_data["Redshift"]["database_name"]
+REDSHIFT_WORKGROUP_NAME = cfg_data["Redshift"]["workgroup_name"]
+IAM_REDSHIFT = cfg_data["Redshift"]["iam_role"]
+REDSHIFT_REGION_NAME = cfg_data["Redshift"]["region_name"]
 
 app = Flask(__name__)
 
@@ -31,6 +49,9 @@ def get_company():
 
 @app.route('/secdata/ticker=<ticker_symbol>')
 def get_secData(ticker_symbol):
+    # conn = redshift_connector.connect(
+    #     host=
+    # )
     cfg_head = secEDGAR_api.headers
     tickerInfo = secEDGAR_api.companyTickerData(cfg_head, ticker_symbol)
     data = secEDGAR_api.secData(tickerInfo['cik_str'])

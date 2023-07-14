@@ -3,9 +3,11 @@
 # import modules
 import requests
 import pandas as pd
+import numpy as np
 import os
 import time
 import csv
+from pprint import pprint
 from dotenv import load_dotenv, dotenv_values
 load_dotenv()
 
@@ -34,7 +36,8 @@ def companyTickerData(headers, companyTicker):
         return f'Sorry, no company found with ticker: {companyTicker}'
     
     return ''
-
+# x = companyTickerData(headers, 'SIVBQ')
+# print(x)
 # function that will query the secEDGAR 'company facts' api route for data
 # this function should do the following:
 # 1 - take the company ticker, find the company's cik (Central Index Key), and add leading zero's (this is needed because the other routes require a 10-digit number)
@@ -66,9 +69,15 @@ def secData(cik_str):
     # reform the payload into a clean dict that can them be pushed into a dataframe and create the csv file from the dataframe
     targetDataDicts = [targetDict for record in req_payload for key in req_payload[record]['units'].keys() for targetDict in req_payload[record]['units'][key]]
     res_payload = pd.DataFrame.from_dict(targetDataDicts)
-    res_payload.to_csv('data_sources/data/secData.csv', index=False)
+    res_payload = res_payload.assign(symbol='SIVBQ')
+    res_payload = res_payload.replace(np.nan, None)
+    res_payload['report_type'] = res_payload['form']
+    res_payload = res_payload.astype('str')
+    res_payload.to_csv('../../data/secData.csv', index=False)
+    pprint(res_payload.dtypes)
 
     # return res_payload.to_json(orient='records')[1:-1].replace('},{', '} {')
     return targetDataDicts
 
 
+secData(719739)
