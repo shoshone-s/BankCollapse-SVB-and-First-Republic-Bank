@@ -31,6 +31,8 @@ def transform_sec_data():
 
     sec_df = extract_sec_data()
     clean_sec_df = sec_df.rename(columns=rename_cols)
+    clean_sec_df['end_date'] = pd.to_datetime(clean_sec_df['end_date'], format='%Y%m%d')
+    clean_sec_df=clean_sec_df[~(clean_sec_df['end_date'] < '2016-12-31')]
 
     return clean_sec_df
 
