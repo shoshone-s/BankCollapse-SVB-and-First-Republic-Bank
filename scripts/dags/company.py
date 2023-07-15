@@ -10,7 +10,7 @@ sys.path += [str(scripts_path / "utilities"), str(scripts_path), str(scripts_pat
 import util
 import alpha_vantage
 import fdic
-import company
+from transform import company
 from redshift_load_data import load_to_redshift
 
 
