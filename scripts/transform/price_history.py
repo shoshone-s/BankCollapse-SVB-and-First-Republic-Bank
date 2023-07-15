@@ -5,6 +5,12 @@ sys.path.append(str(Path(__file__).resolve().parents[1] / "utilities"))
 import util
 import aws_read_write
 
+
+# keep stock data from Jan 2017 to Mar 2022
+MIN_DATE = pd.Timestamp(2017,1,1)
+MAX_DATE = pd.Timestamp(2022,3,31)
+
+
 def transform_alpha_vantage():
     
     dest_table_name = 'price_history'
@@ -16,9 +22,6 @@ def transform_alpha_vantage():
     av_stock_price.columns = [x.lower().replace(' ','_') for x in av_stock_price.columns]
     av_stock_price['date'] = pd.to_datetime(av_stock_price['date'])
 
-    # keep stock data from Jan 2017 to Mar 2022
-    MIN_DATE = pd.Timestamp(2017,1,1)
-    MAX_DATE = pd.Timestamp(2022,3,31)
     clean_av_stock_price = av_stock_price[['symbol', 'date', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
     clean_av_stock_price = clean_av_stock_price[(clean_av_stock_price.date>=MIN_DATE) & (clean_av_stock_price.date<=MAX_DATE)]
     clean_av_stock_price['volume'] = clean_av_stock_price['volume'].astype('Int64')
@@ -36,9 +39,6 @@ def transform_market_watch():
     djusbank.rename(columns={'ticker':'symbol'}, inplace=True)
     djusbank['date'] = pd.to_datetime(djusbank['date']) 
     
-    # keep stock data from Jan 2017 to Mar 2022
-    MIN_DATE = pd.Timestamp(2017,1,1)
-    MAX_DATE = pd.Timestamp(2022,3,31)
     djusbank = djusbank[['symbol', 'date', 'open', 'high', 'low', 'close']] # 'adjusted_close', 'volume' removed from site
     djusbank = djusbank[(djusbank.date>=MIN_DATE) & (djusbank.date<=MAX_DATE)]
     # djusbank['volume'] = djusbank['volume'].astype('Int64')
@@ -56,9 +56,6 @@ def transform_y_finance():
     yf_stock_price.rename(columns={'ticker':'symbol', 'adj_close':'adjusted_close'}, inplace=True)
     yf_stock_price['date'] = pd.to_datetime(yf_stock_price['date']) 
 
-    # keep stock data from Jan 2017 to Mar 2022
-    MIN_DATE = pd.Timestamp(2017,1,1)
-    MAX_DATE = pd.Timestamp(2022,3,31)
     yf_stock_price = yf_stock_price[['symbol', 'date', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume']]
     yf_stock_price = yf_stock_price[(yf_stock_price.date>=MIN_DATE) & (yf_stock_price.date<=MAX_DATE)]
     yf_stock_price['volume'] = yf_stock_price['volume'].astype('Int64')

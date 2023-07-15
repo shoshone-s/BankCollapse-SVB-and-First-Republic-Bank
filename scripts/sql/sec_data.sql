@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS sec_data (
     ID                INTEGER,
+    symbol            VARCHAR(6),
     asset_num         VARCHAR(255),
     report_type       VARCHAR(255),
     start_date        DATE,
