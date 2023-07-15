@@ -6,6 +6,7 @@
         - fdic
 """
 
+import numpy as np
 import pandas as pd
 from pathlib import Path
 import sys
@@ -47,7 +48,7 @@ def transform_fdic():
     # selected banks from FDIC
     CERT_LIST = [24735, 59017, 21761, 628, 29147, 27389, 3511, 5146, 18409, 33947, 7213, 3510, 34968, 57803]
     
-    fdic_df['REPDTE'] = pd.to_datetime(fdic_df['REPDTE'])
+    fdic_df['REPDTE'] = pd.to_datetime(fdic_df['REPDTE'], format='%Y%m%d')
     fdic_df = fdic_df[fdic_df.CERT.isin(CERT_LIST) & (fdic_df.REPDTE>=MIN_DATE) & (fdic_df.REPDTE<=MAX_DATE)][['CERT','REPDTE','ASSET','LIAB','ROA','ROE','EEFFR','NIMY','INTINCY']]
     fdic_df['symbol'] = fdic_df['CERT'].replace({18409:'TD', 33947:'TD', 21761:'JPM', 628:'JPM', 24735:'SIVBQ', 27389:'WFC', 3511:'WFC', 5146:'WFC', 29147:'NECB', 34968:'BPOP', 3510:'BAC', 57803:'ALLY', 59017:'FRC', 7213:'C'})
 
@@ -61,7 +62,12 @@ def transform_financials():
     fdic_df.rename(columns={'CERT':'fdic_cert_id', 'REPDTE':'report_date', 'ASSET':'total_assets', 'LIAB':'total_liabilities', 'ROA':'return_on_assets', 'ROE':'return_on_equity', 'EEFFR':'efficiency_ratio', 'NIMY':'net_interest_margin', 'INTINCY':'yield_on_earning_assets'}, inplace=True)
     
     clean_financials = pd.concat([av_df, fdic_df])[['symbol', 'fdic_cert_id', 'report_date', 'type', 'currency', 'total_assets', 'total_liabilities', 'total_shareholder_equity', 'total_revenue', 'net_income', 'gross_profit', 'operating_income', 'ebit', 'operating_cashflow', 'profit_loss', 'return_on_assets', 'return_on_equity', 'efficiency_ratio', 'net_interest_margin', 'yield_on_earning_assets']]
+       
+    for col in clean_financials.columns:
+        clean_financials[col] = clean_financials[col].replace('None',np.nan)
 
+    clean_financials['fdic_cert_id'] = clean_financials['fdic_cert_id'].astype('Int64')
+    
     return clean_financials
 
 
