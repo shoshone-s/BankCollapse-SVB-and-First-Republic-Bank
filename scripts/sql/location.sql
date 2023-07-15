@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS location (
     city               VARCHAR(255),
     state              VARCHAR(255),
     zip                VARCHAR(5),
-    latitude           FLOAT,
-    longitude          FLOAT,
+    latitude           DECIMAL(8,6),
+    longitude          DECIMAL(9,6),
     primary key(ID)
 );

@@ -31,7 +31,7 @@ def transform_sec_data():
         'start': 'start_date',
         'index': 'id'
     }
-    sec_df = sec_df.rename(columns=rename_cols)[['id','asset_num','report_type','start_date','end_date','date_filed','fiscal_year','fiscal_period','form','frame','value']]
+    sec_df = sec_df.rename(columns=rename_cols).assign(symbol='SIVBQ')[['id','symbol','asset_num','report_type','start_date','end_date','date_filed','fiscal_year','fiscal_period','form','frame','value']]
     
     return sec_df
 

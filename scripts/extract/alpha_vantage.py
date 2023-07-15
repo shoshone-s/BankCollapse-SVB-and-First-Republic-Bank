@@ -38,37 +38,6 @@ def extract_companies():
     
     return companies
 
-# FIXME: This data is not being transformed or to a table in the database
-def extract_financials():
-    incst = pd.DataFrame()
-    for symbol in symbols:
-        time.sleep(20)
-        incst_url = f'https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol={symbol}&apikey={AV_API_KEY}'
-        r = requests.get(incst_url)
-        incst_data = r.json()
-        incst = pd.concat([incst, pd.concat([pd.DataFrame(incst_data['quarterlyReports']).assign(type='quarterly'), pd.DataFrame(incst_data['annualReports']).assign(type='annual')]).assign(symbol=symbol)])
-    print("Successfully extracted from API: income statement")
-
-    balsh = pd.DataFrame()
-    for symbol in symbols:
-        time.sleep(20)
-        balsh_url = f'https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol={symbol}&apikey={AV_API_KEY}'
-        r = requests.get(balsh_url)
-        balsh_data = r.json()
-        balsh = pd.concat([balsh, pd.concat([pd.DataFrame(balsh_data['quarterlyReports']).assign(type='quarterly'), pd.DataFrame(balsh_data['annualReports']).assign(type='annual')]).assign(symbol=symbol)])
-    print("Successfully extracted from API: balance sheet")
-
-    cashflow = pd.DataFrame()
-    for symbol in symbols:
-        time.sleep(20)
-        cashflow_url = f'https://www.alphavantage.co/query?function=CASH_FLOW&symbol={symbol}&apikey={AV_API_KEY}'
-        r = requests.get(cashflow_url)
-        cashflow_data = r.json()
-        cashflow = pd.concat([cashflow, pd.concat([pd.DataFrame(cashflow_data['quarterlyReports']).assign(type='quarterly'), pd.DataFrame(cashflow_data['annualReports']).assign(type='annual')]).assign(symbol=symbol)])
-    print("Successfully extracted from API: cash flow")
-
-    return pd.concat([balsh, incst, cashflow]).reset_index()
-
 
 def extract_price_history():
     stock_prices = pd.DataFrame()
@@ -84,6 +53,42 @@ def extract_price_history():
     
     return stock_prices
 
+
+# FIXME: This data is not being transformed or to a table in the database
+def extract_financials():
+    
+    balsh = pd.DataFrame()
+    for symbol in symbols:
+        time.sleep(20)
+        balsh_url = f'https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol={symbol}&apikey={AV_API_KEY}'
+        r = requests.get(balsh_url)
+        balsh_data = r.json()
+        balsh = pd.concat([balsh, pd.concat([pd.DataFrame(balsh_data['quarterlyReports']).assign(type='quarterly'), pd.DataFrame(balsh_data['annualReports']).assign(type='annual')]).assign(symbol=symbol)])
+    print("Successfully extracted from API: balance sheet")
+    
+    incst = pd.DataFrame()
+    for symbol in symbols:
+        time.sleep(20)
+        incst_url = f'https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol={symbol}&apikey={AV_API_KEY}'
+        r = requests.get(incst_url)
+        incst_data = r.json()
+        incst = pd.concat([incst, pd.concat([pd.DataFrame(incst_data['quarterlyReports']).assign(type='quarterly'), pd.DataFrame(incst_data['annualReports']).assign(type='annual')]).assign(symbol=symbol)])
+    print("Successfully extracted from API: income statement")
+
+    cashflow = pd.DataFrame()
+    for symbol in symbols:
+        time.sleep(20)
+        cashflow_url = f'https://www.alphavantage.co/query?function=CASH_FLOW&symbol={symbol}&apikey={AV_API_KEY}'
+        r = requests.get(cashflow_url)
+        cashflow_data = r.json()
+        cashflow = pd.concat([cashflow, pd.concat([pd.DataFrame(cashflow_data['quarterlyReports']).assign(type='quarterly'), pd.DataFrame(cashflow_data['annualReports']).assign(type='annual')]).assign(symbol=symbol)])
+    print("Successfully extracted from API: cash flow")
+
+    return pd.concat([balsh.assign(source='balance sheet'), 
+                      incst.assign(source='income statement'),
+                      cashflow.assign(source='cash flow')]).reset_index()
+
+
 # upload raw data to S3 bucket
 
 def load_raw_companies():
@@ -92,29 +97,19 @@ def load_raw_companies():
     csv_file_name = SOURCE_NAME + '_' + dest_table_name + '.csv'
     util.load_raw_data(companies_df, csv_file_name)
 
-# FIXME: This data is not being transformed or to a table in the database
-def load_raw_income_statement():
-    incst_df = extract_companies()
-    csv_file_name = "\\income_statement.csv"
-    util.load_raw_data(incst_df, csv_file_name)
-
-# FIXME: This data is not being transformed or to a table in the database
-def load_raw_finanials():
-    fin_df = extract_financials()
-    csv_file_name = "\\alpha_vantange_financials.csv"
-    util.load_raw_data(fin_df, csv_file_name)
-
-# FIXME: This data is not being transformed or to a table in the database
-def load_raw_cashflow():
-    cashflow_df = extract_cashflow()
-    csv_file_name = "\\cash_flow.csv"
-    util.load_raw_data(cashflow_df, csv_file_name)
-
 def load_raw_price_history():
     stock_prices = extract_price_history()
     dest_table_name = 'price_history'
     csv_file_name = SOURCE_NAME + '_' + dest_table_name + '.csv'
     util.load_raw_data(stock_prices, csv_file_name)    
+    
+# FIXME: This data is not being transformed or to a table in the database
+def load_raw_financials():
+    fin_df = extract_financials()
+    dest_table_name = 'financials'
+    csv_file_name = SOURCE_NAME + '_' + dest_table_name + '.csv'
+    util.load_raw_data(fin_df, csv_file_name)
+
 
 ### END OF EXTRACT METHODS ###
 
@@ -122,19 +117,13 @@ def load_raw_price_history():
 def extract(table_name='all'): 
     if table_name == 'all':
         load_raw_companies()
-        load_raw_income_statement()
-        load_raw_balance_sheet()
-        load_raw_cashflow()
         load_raw_price_history()
+        load_raw_financials()
     elif table_name == 'company':
         load_raw_companies()
-    elif table_name == 'income_statement':
-        load_raw_income_statement()
-    elif table_name == 'balance_sheet':
-        load_raw_balance_sheet()
-    elif table_name == 'cashflow':
-        load_raw_cashflow()
     elif table_name == 'price_history':
         load_raw_price_history()
+    elif table_name == 'financials':
+        load_raw_financials()
     else:
         print('Invalid table name')
