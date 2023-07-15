@@ -9,7 +9,7 @@ sys.path += [str(scripts_path / "utilities"), str(scripts_path), str(scripts_pat
 
 import util
 import macrotrends
-import debt_to_equity
+from transform import debt_to_equity
 from redshift_load_data import load_to_redshift
 
 

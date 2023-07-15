@@ -11,7 +11,7 @@ import util
 import alpha_vantage
 import market_watch
 import y_finance
-import price_history
+from transform import price_history
 from redshift_load_data import load_to_redshift
 
 
