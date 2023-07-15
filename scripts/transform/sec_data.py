@@ -7,11 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1] / "utilities"))
 import util
 import aws_read_write
 
-from dotenv import load_dotenv, dotenv_values
-load_dotenv()
 
-
-# TODO: check if this works... 
 def transform_sec_data():
     
     dest_table_name = 'sec_data'
@@ -31,7 +27,7 @@ def transform_sec_data():
         'start': 'start_date',
         'index': 'id'
     }
-    sec_df = sec_df.rename(columns=rename_cols).assign(symbol='SIVBQ')[['id','symbol','asset_num','report_type','start_date','end_date','date_filed','fiscal_year','fiscal_period','form','frame','value']]
+    sec_df = sec_df.rename(columns=rename_cols).assign(symbol='SIVBQ')[['id','symbol','asset_num','start_date','end_date','date_filed','fiscal_year','fiscal_period','form','frame','value']]
     
     return sec_df
 

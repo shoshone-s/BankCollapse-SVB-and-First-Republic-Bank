@@ -12,12 +12,8 @@ sys.path.append(str(Path(__file__).resolve().parents[1] / "utilities"))
 import util
 
 
-# read credentials from the config file
-cfg_data = configparser.ConfigParser()
-cfg_data.read(Path(__file__).resolve().parents[2] / "config" / "keys_config.cfg")
-
 # save Alpha Vantage API key
-AV_API_KEY = cfg_data["AlphaVantage"]["api_key"]
+AV_API_KEY = util.AV_API_KEY
 
 SOURCE_NAME = 'alpha_vantage'
 
