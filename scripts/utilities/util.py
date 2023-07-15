@@ -15,6 +15,8 @@ AWS_ACCOUNT_ID = cfg_data["AWS"]["account_id"]
 S3_BUCKET_NAME = cfg_data["S3"]["bucket_name"]
 SQS_QUEUE_NAME = cfg_data["SQS"]["queue_name"]
 
+AV_API_KEY = cfg_data["AlphaVantage"]["api_key"]
+
 RAW_DATA_PATH = str(Path(__file__).resolve().parents[2] / "data" / "raw_data") + "\\"
 CLEAN_DATA_PATH = str(Path(__file__).resolve().parents[2] / "data" / "clean_data") + "\\"
 

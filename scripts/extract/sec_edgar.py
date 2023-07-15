@@ -1,5 +1,4 @@
 """
-NOT TESTED
 """
 import requests
 import pandas as pd
@@ -9,23 +8,17 @@ import csv
 import util
 import aws_read_write
 
-from dotenv import load_dotenv, dotenv_values
-load_dotenv()
-
-# DEFAULT_config=dotenv_values('.env')
-DEFAULT_headers = util.cfg_data["SEC_EDGAR_USER_AGENT"]["user_agent"]
-
 
 # request for basic company data
 # this will return a list of dictionaries containing the following:
 # - 'cik_str' - necesary to make other requests
 # - 'ticker' - the company's stock ticker name
 # - 'title' - name of the company
-def companyTickerData(headers, companyTicker):
+def companyTickerData(companyTicker):
     # get data from all companies
     secCompanyInfo = requests.get(
         'https://www.sec.gov/files/company_tickers.json',
-        headers=headers
+        headers=DEFAULT_headers
     )
     totalCompanyData=secCompanyInfo.json()
     try:
@@ -60,7 +53,7 @@ def secData(cik_str):
         (
             f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cikNumber}.json'
         ),
-        headers=headers
+        headers=DEFAULT_headers
     )
     # create a dictionary of the requested data
     for query in queryData:
@@ -76,9 +69,8 @@ def secData(cik_str):
     return targetDataDicts
 
 def extract_sec_data():
-    cfg_head = DEFAULT_headers
     ticker_symbol = 'SIVBQ'
-    tickerInfo = companyTickerData(cfg_head, ticker_symbol)
+    tickerInfo = companyTickerData(ticker_symbol)
     data = secData(tickerInfo['cik_str']) 
 
     sec_df = pd.DataFrame(data)
