@@ -1,5 +1,4 @@
-yfinance --upgrade --no-cache-dir
+yfinance # Yahoo Finance API
 boto3 # Amazon SDK for Python
-os # Opening and reading files from the file system
 pathlib # Specifying the path from the OS
 python-dotenv # Reading .env variables from the filesystem if the AWS CLI is not being used for authentication
