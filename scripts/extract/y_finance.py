@@ -21,7 +21,6 @@ def extract_price_history():
     for company in STOCKS_IN_SCOPE:
         data = yf.download(company, period='max', interval='1d').reset_index()
         data.insert(loc=0, column='Ticker', value=company)
-        print(len(data))
         df = pd.concat([data, df])
 
     # # augment so that it give the min for each date
