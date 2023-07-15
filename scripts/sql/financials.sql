@@ -1,6 +1,7 @@
-CREATE TABLE IF NOT EXISTS financials (
+CREATE TABLE IF NOT EXISTS financials ( 
     ID                        INTEGER IDENTITY(0,1),
     symbol                    VARCHAR(6),
+    fdic_cert_id              INTEGER,
     report_date               DATE,
     type                      VARCHAR(255),
     currency                  VARCHAR(255),
