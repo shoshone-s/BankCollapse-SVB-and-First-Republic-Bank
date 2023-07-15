@@ -51,10 +51,9 @@ def transform_y_finance():
     csv_file_name = source + '_' + dest_table_name + '.csv'
     raw_s3_object_name= 'data/raw_data/' + csv_file_name
     
-    yf_stock_price = aws_read_write.get_csv(bucket_name=util.S3_BUCKET_NAME, object_name=raw_s3_object_name).drop(columns=['Unnamed: 0'])
+    yf_stock_price = aws_read_write.get_csv(bucket_name=util.S3_BUCKET_NAME, object_name=raw_s3_object_name)
     yf_stock_price.columns = [x.lower().replace(' ','_') for x in yf_stock_price.columns]
-    yf_stock_price.rename(columns={'datetime':'date', 'adj_close':'adjusted_close'}, inplace=True)
-    yf_stock_price['symbol'] = 'SIVBQ'
+    yf_stock_price.rename(columns={'ticker':'symbol', 'adj_close':'adjusted_close'}, inplace=True)
     yf_stock_price['date'] = pd.to_datetime(yf_stock_price['date']) 
 
     # keep stock data from Jan 2017 to Mar 2022

@@ -15,11 +15,9 @@ def extract_price_history():
     # frequency=daily, results limited to one year
     url = "https://www.marketwatch.com/investing/index/djusbk/downloaddatapartial?startdate={}%2000:00:00&enddate={}%2000:00:00&daterange=d30&frequency=p1d&csvdownload=true&downloadpartial=false&newdates=false"
     for year in range(start_year, end_year + 1):
-        historical_quotes = pd.concat([
-            historical_quotes,
-            pd.read_csv(url.replace("startdate={}", "startdate=" + pd.Timestamp(year, 1, 1).strftime('%m/%d/%Y')).replace(
-                "enddate={}", "enddate=" + pd.Timestamp(year, 12, 31).strftime('%m/%d/%Y')))
-        ])
+        year_df = pd.read_csv(url.replace("startdate={}", "startdate=" + pd.Timestamp(year, 1, 1).strftime('%m/%d/%Y')).replace(
+                "enddate={}", "enddate=" + pd.Timestamp(year, 12, 31).strftime('%m/%d/%Y')), storage_options={'User-Agent':'Mozilla/5.0'})
+        historical_quotes = pd.concat([historical_quotes, year_df])
 
     historical_quotes.insert(loc=0, column='Ticker', value='DJUSBK')
     
