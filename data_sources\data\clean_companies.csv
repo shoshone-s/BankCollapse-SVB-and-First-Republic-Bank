@@ -1,0 +1,15 @@
+symbol,cert,name,category,status,established_date,exchange,sector
+TD,18409,"TD Bank, National Association",National bank,currently open and insured by the FDIC,1852-01-01,NYSE,FINANCE
+TD,33947,"TD Bank USA, National Association",National bank,currently open and insured by the FDIC,1994-10-13,NYSE,FINANCE
+JPM,21761,"JPMorgan Chase Bank, Dearborn",State commercial bank,currently open and insured by the FDIC,1974-09-16,NYSE,FINANCE
+JPM,628,"JPMorgan Chase Bank, National Association",National bank,currently open and insured by the FDIC,1824-01-01,NYSE,FINANCE
+SIVB,24735,Silicon Valley Bank,State commercial bank,closed or not insured by FDIC,1983-10-17,,
+WFC,27389,Wells Fargo National Bank West,National bank,currently open and insured by the FDIC,1988-12-01,NYSE,FINANCE
+WFC,3511,"Wells Fargo Bank, National Association",National bank,currently open and insured by the FDIC,1870-01-01,NYSE,FINANCE
+WFC,5146,"Wells Fargo Bank South Central, National Association",National bank,currently open and insured by the FDIC,1894-06-18,NYSE,FINANCE
+NECB,29147,NorthEast Community Bank,State chartered stock savings and co-operative bank,currently open and insured by the FDIC,1934-09-01,NASDAQ,FINANCE
+BPOP,34968,Banco Popular de Puerto Rico,State commercial bank,currently open and insured by the FDIC,1999-01-02,NASDAQ,FINANCE
+BAC,3510,"Bank of America, National Association",National bank,currently open and insured by the FDIC,1904-10-17,NYSE,FINANCE
+ALLY,57803,Ally Bank,State commercial bank,currently open and insured by the FDIC,2004-08-02,NYSE,FINANCE
+FRC,59017,First Republic Bank,State commercial bank,closed or not insured by FDIC,2010-07-01,,
+C,7213,"Citibank, National Association",National bank,currently open and insured by the FDIC,1812-06-16,NYSE,FINANCE
